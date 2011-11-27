@@ -28,6 +28,9 @@ require 'tesseract/c'
 module Tesseract
 
 class API
+	##
+	# Get a pointer to a tesseract-ocr usable image from a path, a string
+	# with the data or an IO stream.
 	def self.image_for (image)
 		if image.is_a?(String) && File.exists?(File.expand_path(image))
 			C::pix_read(File.expand_path(image))
@@ -42,12 +45,14 @@ class API
 		}
 	end
 
-	def self.image_finalizer (image)
+	def self.image_finalizer (image) # :nodoc:
 		proc {
 			C::pix_destroy(pointer)
 		}
 	end
 
+	##
+	# Transform a language code to tesseract-ocr usable codes
 	def self.to_language_code (code)
 		case code.to_s.downcase
 		when 'en' then 'eng'
@@ -69,7 +74,7 @@ class API
 		ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi)
 	end
 
-	def self.finalizer (pointer)
+	def self.finalizer (pointer) # :nodoc:
 		proc {
 			C::destroy(pointer)
 		}

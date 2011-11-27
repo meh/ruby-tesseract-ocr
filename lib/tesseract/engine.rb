@@ -31,7 +31,7 @@ class Engine
 	namedic :path, :language, :mode, :variables,
 		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {} },
 		:alias    => { :data => :path, :lang => :language }
-	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {})
+	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}) # :yields: self
 		@api = API.new
 
 		@path      = path
@@ -44,7 +44,11 @@ class Engine
 		_init
 	end
 
-	def with (&block)
+	def version
+		@api.version
+	end
+
+	def with (&block) # :yields: self
 		self.class.new(@path, @language, @mode, @variables.clone, &block)
 	end
 
