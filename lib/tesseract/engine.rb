@@ -90,6 +90,18 @@ class Engine
 		end
 	end
 
+	def page_segmentation_mode
+		@api.get_page_seg_mode
+	end
+
+	def page_segmentation_mode= (value)
+		@api.page_seg_mode = if value.to_i >= 1 && value.to_i <= 10
+			value.to_i
+		else
+			value.to_s.upcase.to_sym
+		end
+	end
+
 	def image= (image)
 		@image = image
 	end
