@@ -33,6 +33,10 @@ OptionParser.new do |o|
 		options[:confidence] = true
 	end
 
+	o.on '-C', '--config PATH...', Array, 'config files to load' do |config|
+		options[:config] = config
+	end
+
 	o.on '-b', '--blacklist LIST', 'blacklist the following chars' do |value|
 		options[:blacklist] = value
 	end
@@ -47,6 +51,7 @@ Tesseract::Engine.new(options[:path], options[:language], options[:mode]) {|engi
 	engine.whitelist options[:whitelist] if options[:whitelist]
 
 	engine.page_segmentation_mode = options[:psm] if options[:psm]
+	engine.load_config options[:config]           if options[:config]
 }.tap {|engine|
 	if options[:unlv]
 		puts engine.text_for(ARGV.first).unlv.strip

@@ -122,7 +122,7 @@ class API
 		C::init(to_ffi, datapath, language.to_s, mode)
 	end
 
-	def read_config_file (path, init_only = true)
+	def read_config_file (path, init_only = false)
 		C::read_config_file(to_ffi, path, init_only)
 	end
 

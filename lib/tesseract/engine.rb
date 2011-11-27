@@ -28,24 +28,41 @@ require 'tesseract/api'
 module Tesseract
 
 class Engine
+	attr_reader :config
+
 	namedic :path, :language, :mode, :variables,
 		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {} },
 		:alias    => { :data => :path, :lang => :language }
 	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}) # :yields: self
 		@api = API.new
 
+		@initializing = true
+
 		@path      = path
 		@language  = language
 		@mode      = mode
 		@variables = variables
+		@config    = []
 
 		yield self if block_given?
+
+		@initializing = false
 
 		_init
 	end
 
 	def version
 		@api.version
+	end
+
+	def load_config (*config)
+		@config.concat config.flatten.compact.uniq
+
+		unless @initializing
+			@config.each {|conf|
+				@api.read_config_file(conf)
+			}
+		end
 	end
 
 	def with (&block) # :yields: self
@@ -70,7 +87,7 @@ class Engine
 		define_method "#{name}=" do |value|
 			instance_variable_set "@#{name}", value
 
-			_init
+			_init unless @initializing
 		end
 	}
 
@@ -198,6 +215,10 @@ private
 
 		@variables.each {|name, value|
 			@api.set_variable(name.to_s, value.to_s)
+		}
+
+		@config.each {|conf|
+			@api.read_config_file(conf)
 		}
 	end
 
