@@ -40,6 +40,14 @@ class API
 		end
 	end
 
+	def self.to_language_code (code)
+		case code.to_s.downcase
+		when 'en' then 'eng'
+		when 'pt' then 'por'
+		when 'it' then 'ita'
+		end or code
+	end
+
 	Types = {
 		int:    [:integer],
 		bool:   [:boolean],

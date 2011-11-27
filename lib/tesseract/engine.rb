@@ -119,7 +119,7 @@ private
 			@api.set_variable(name.to_s, value.to_s)
 		}
 
-		@api.init(@path, @language, @mode)
+		@api.init(File.expand_path(@path), API.to_language_code(@language), @mode)
 	end
 
 	def _confidences (words)
