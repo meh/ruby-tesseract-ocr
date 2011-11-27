@@ -27,6 +27,13 @@ describe Tesseract::Engine do
 			engine.image = 'second.png'
 			engine.text_at(242, 191, 129, 31).strip.should == 'OH HAI 1234'
 		end
+
+		it 'raises when going out fo the boundaries' do
+			expect {
+				engine.image = 'second.png'
+				engine.text_at(10, 20, 1000, 1000)
+			}.should raise_error
+		end
 	end
 
 	describe '#words_for' do

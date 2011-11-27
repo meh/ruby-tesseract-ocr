@@ -42,6 +42,16 @@ class API
 		else
 			raise ArgumentError, 'invalid image'
 		end.tap {|image|
+			class << image
+				def width
+					C::pix_get_width(self)
+				end
+
+				def height
+					C::pix_get_height(self)
+				end
+			end
+
 			ObjectSpace.define_finalizer image, image_finalizer(image)
 		}
 	end

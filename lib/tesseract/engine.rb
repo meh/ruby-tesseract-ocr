@@ -93,17 +93,17 @@ class Engine
 
 	def blacklist (what = nil)
 		if what
-			set 'tessedit_char_blacklist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s
+			set('tessedit_char_blacklist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s)
 		else
-			get 'tessedit_char_blacklist'.chars.to_a
+			get('tessedit_char_blacklist').chars.to_a
 		end
 	end
 
 	def whitelist (what = nil)
 		if what
-			set 'tessedit_char_whitelist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s
+			set('tessedit_char_whitelist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s)
 		else
-			get 'tessedit_char_whitelist'.chars.to_a
+			get('tessedit_char_whitelist').chars.to_a
 		end
 	end
 
@@ -132,8 +132,12 @@ class Engine
 
 		x      ||= 0
 		y      ||= 0
-		width  ||= C::pix_get_width(image)
-		height ||= C::pix_get_height(image)
+		width  ||= image.width
+		height ||= image.height
+
+		if (x + width) > image.width || (y + height) > image.height
+			raise IndexError, 'image access out of boundaries'
+		end
 
 		@api.set_image(image)
 		@api.set_rectangle(x, y, width, height)
@@ -175,8 +179,12 @@ class Engine
 		page   ||= 0
 		x      ||= 0
 		y      ||= 0
-		width  ||= C::pix_get_width(image)
-		height ||= C::pix_get_height(image)
+		width  ||= image.width
+		height ||= image.height
+
+		if (x + width) > image.width || (y + height) > image.height
+			raise IndexError, 'image access out of boundaries'
+		end
 
 		@api.set_image(image)
 		@api.set_rectangle(x, y, width, height)
@@ -189,7 +197,7 @@ class Engine
 				@y      = y.to_i
 				@width  = width.to_i
 				@height = height.to_i
-				@page   = page.to_i + 1
+				@page   = page.to_i
 
 				class << self
 					attr_reader :x, :y, :width, :height, :page
