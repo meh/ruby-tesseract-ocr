@@ -22,7 +22,6 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
 require 'iso-639'
 require 'tesseract/c'
 
@@ -149,8 +148,6 @@ class API
 		C::set_image(to_ffi, pix)
 	end
 
-	namedic :left, :top, :width, :height,
-		:alias => { :l => :left, :t => :top, :w => :width, :h => :height }
 	def set_rectangle (left, top, width, height)
 		C::set_rectangle(to_ffi, left, top, width, height)
 	end
