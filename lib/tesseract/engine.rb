@@ -91,20 +91,20 @@ class Engine
 		end
 	}
 
-	def blacklist (what = nil)
-		if what
-			set('tessedit_char_blacklist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s)
-		else
-			get('tessedit_char_blacklist').chars.to_a
-		end
+	def blacklist
+		get('tessedit_char_blacklist').chars.to_a
 	end
 
-	def whitelist (what = nil)
-		if what
-			set('tessedit_char_whitelist', what.respond_to?(:to_a) ? what.to_a.join : what.to_s)
-		else
-			get('tessedit_char_whitelist').chars.to_a
-		end
+	def blacklist= (value)
+		set('tessedit_char_blacklist', value.respond_to?(:to_a) ? value.to_a.join : value.to_s)
+	end
+
+	def whitelist
+		get('tessedit_char_whitelist').chars.to_a
+	end
+
+	def whitelist= (value)
+		set('tessedit_char_whitelist', value.respond_to?(:to_a) ? value.to_a.join : value.to_s)
 	end
 
 	def page_segmentation_mode

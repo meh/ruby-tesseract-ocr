@@ -19,15 +19,14 @@ Example
 require 'tesseract'
 
 e = Tesseract::Engine.new {|e|
-	e.language = :eng
-
-	e.blacklist '|'
+	e.language  = :eng
+	e.blacklist = '|'
 }
 
 e.text_for('test/first.png').strip # => 'ABC'
 e.words_for('test/second.png') # => ["I'm", "12", "and", "what", "is", "this.", "INSTALL", "GENTOO", "OH", "HAI", "1234"]
 
-e.with { |e| e.whitelist '1234567890' }.text_for('test/second.png') # => "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234\n\n"
+e.with { |e| e.whitelist = '1234567890' }.text_for('test/second.png') # => "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234\n\n"
 ```
 
 You can pass to `#text_for` either a path, an IO object or a string containing the image,
