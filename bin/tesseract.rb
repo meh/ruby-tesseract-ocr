@@ -21,8 +21,12 @@ OptionParser.new do |o|
 		options[:mode] = value.upcase.to_sym
 	end
 
-	o.on '-u', '--unlv' do
+	o.on '-u', '--unlv', 'output in UNLV format' do
 		options[:unlv] = true
+	end
+
+	o.on '-c', '--confidence', 'output the mean confidence of the recognition' do
+		options[:confidence] = true
 	end
 
 	o.on '-b', '--blacklist LIST', 'blacklist the following chars' do |value|
@@ -40,6 +44,8 @@ Tesseract::Engine.new(options[:path], options[:language], options[:mode]) {|engi
 }.tap {|engine|
 	if options[:unlv]
 		puts engine.text_for(ARGV.first).unlv.strip
+	elsif options[:confidence]
+		puts engine.text_for(ARGV.first).confidence
 	else
 		puts engine.text_for(ARGV.first).strip
 	end
