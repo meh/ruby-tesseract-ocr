@@ -15,6 +15,12 @@ describe Tesseract::Engine do
 		it 'can read the second test image' do
 			engine.text_for('second.png').strip.should == "|'m 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
 		end
+
+		it 'raises when going out of the image boundaries' do
+			expect {
+				engine.text_for('second.png', 0, 0, 1000, 1000)
+			}.should raise_error
+		end
 	end
 
 	describe '#text_at' do
@@ -28,7 +34,7 @@ describe Tesseract::Engine do
 			engine.text_at(242, 191, 129, 31).strip.should == 'OH HAI 1234'
 		end
 
-		it 'raises when going out fo the boundaries' do
+		it 'raises when going out of the image boundaries' do
 			expect {
 				engine.image = 'second.png'
 				engine.text_at(10, 20, 1000, 1000)
@@ -44,6 +50,12 @@ describe Tesseract::Engine do
 		it 'can read the second test image' do
 			engine.words_for('second.png').should == %w(|'m 12 and what is this. INSTALL GENTOO OH HAI 1234)
 		end
+
+		it 'raises when going out of the image boundaries' do
+			expect {
+				engine.words_for('second.png', 0, 0, 1000, 1000)
+			}.should raise_error
+		end
 	end
 
 	describe '#words_at' do
@@ -56,6 +68,13 @@ describe Tesseract::Engine do
 			engine.image = 'second.png'
 			engine.words_at(242, 191, 129, 31).should == %w(OH HAI 1234)
 		end
+
+		it 'raises when going out of the image boundaries' do
+			expect {
+				engine.image = 'second.png'
+				engine.words_at(10, 20, 1000, 1000)
+			}.should raise_error
+		end
 	end
 
 	describe '#chars_for' do
@@ -65,6 +84,12 @@ describe Tesseract::Engine do
 
 		it 'can read the second test image' do
 			engine.chars_for('second.png').should == "|'m 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234".gsub(/\s+/, '').split('')
+		end
+
+		it 'raises when going out of the image boundaries' do
+			expect {
+				engine.chars_for('second.png', 0, 0, 1000, 1000)
+			}.should raise_error
 		end
 	end
 
@@ -81,6 +106,13 @@ describe Tesseract::Engine do
 
 			engine.image = 'second.png'
 			engine.chars_at(242, 191, 129, 31).should == 'OH HAI 1234'.gsub(/\s+/, '').split('')
+		end
+
+		it 'raises when going out of the image boundaries' do
+			expect {
+				engine.image = 'second.png'
+				engine.words_at(10, 20, 1000, 1000)
+			}.should raise_error
 		end
 	end
 	
