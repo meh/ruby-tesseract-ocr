@@ -23,6 +23,7 @@
 #++
 
 require 'namedic'
+require 'iso_country_codes'
 require 'tesseract/c'
 
 module Tesseract
@@ -54,11 +55,9 @@ class API
 	##
 	# Transform a language code to tesseract-ocr usable codes
 	def self.to_language_code (code)
-		case code.to_s.downcase
-		when 'en' then 'eng'
-		when 'pt' then 'por'
-		when 'it' then 'ita'
-		end or code
+		IsoCountryCodes.find(code).alpha3.downcase
+	rescue
+		code
 	end
 
 	Types = {

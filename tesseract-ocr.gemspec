@@ -1,11 +1,11 @@
 Kernel.load 'lib/tesseract/version.rb'
 
 Gem::Specification.new {|s|
-	s.name         = 'tesseract'
+	s.name         = 'tesseract-ocr'
 	s.version      = Tesseract.version
 	s.author       = 'meh.'
 	s.email        = 'meh@paranoici.org'
-	s.homepage     = 'http://github.com/meh/ruby-tesseract'
+	s.homepage     = 'http://github.com/meh/ruby-tesseract-ocr'
 	s.platform     = Gem::Platform::RUBY
 	s.summary      = 'A wrapper library to the tesseract-ocr API.'
 
