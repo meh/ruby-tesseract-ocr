@@ -33,3 +33,23 @@ e.with { |e| e.whitelist '1234567890' }.text_for('test/second.png') # => "11111 
 You can pass to `#text_for` either a path, an IO object or a string containing the image,
 there are few supported formats so try to stay in the BMP/JPEG/PNG boundaries. This means
 that you can also work on an image with RMagick or similar and then pass the raw data.
+
+Using the binary
+----------------
+You can also use the shipped executable in the following way:
+
+```bash
+> tesseract.rb -h
+Usage: tesseract [options]
+    -p, --path PATH                  datapath to set
+    -l, --language LANGUAGE          language to use
+    -m, --mode MODE                  mode to use
+    -u, --unlv                       output in UNLV format
+    -c, --confidence                 output the mean confidence of the recognition
+    -b, --blacklist LIST             blacklist the following chars
+    -w, --whitelist LIST             whitelist the following chars
+> tesseract.rb test/first.png 
+ABC
+> tesseract.rb -c test/first.png 
+86
+```
