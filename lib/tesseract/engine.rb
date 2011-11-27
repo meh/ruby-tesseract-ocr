@@ -39,6 +39,8 @@ class Engine
 		@mode      = mode
 		@variables = variables
 
+		yield self if block_given?
+
 		_init
 	end
 
