@@ -31,9 +31,9 @@ class Engine
 	attr_reader :config
 
 	namedic :path, :language, :mode, :variables,
-		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {} },
+		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {}, :config => [] },
 		:alias    => { :data => :path, :lang => :language }
-	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}) # :yields: self
+	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}, config = []) # :yields: self
 		@api = API.new
 
 		@initializing = true
@@ -42,7 +42,7 @@ class Engine
 		@language  = language
 		@mode      = mode
 		@variables = variables
-		@config    = []
+		@config    = config
 
 		yield self if block_given?
 

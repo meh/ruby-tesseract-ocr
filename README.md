@@ -41,11 +41,13 @@ You can also use the shipped executable in the following way:
 ```bash
 > tesseract.rb -h
 Usage: tesseract [options]
-    -p, --path PATH                  datapath to set
+        --path PATH                  datapath to set
     -l, --language LANGUAGE          language to use
     -m, --mode MODE                  mode to use
+    -p, --psm MODE                   page segmentation mode to use
     -u, --unlv                       output in UNLV format
     -c, --confidence                 output the mean confidence of the recognition
+    -C, --config PATH...             config files to load
     -b, --blacklist LIST             blacklist the following chars
     -w, --whitelist LIST             whitelist the following chars
 > tesseract.rb test/first.png 
