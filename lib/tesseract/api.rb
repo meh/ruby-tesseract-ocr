@@ -28,6 +28,18 @@ require 'tesseract/c'
 module Tesseract
 
 class API
+	def self.image_for (image)
+		if image.is_a?(String) && File.exists?(File.expand_path(image))
+			C::pix_read(File.expand_path(image))
+		elsif image.is_a?(String)
+			C::pix_read_mem(image, image.bytesize)
+		elsif image.is_a?(IO)
+			C::pix_read_stream(image.to_i)
+		else
+			raise ArgumentError, 'invalid image'
+		end
+	end
+
 	Types = {
 		int:    [:integer],
 		bool:   [:boolean],
@@ -65,9 +77,9 @@ class API
 
 	def get_variable (name, type = nil)
 		if type.nil?
-			type = Types.keys.find { |type| C.__send__ "has_#{type}_variable", name }
+			type = Types.keys.find { |type| C.__send__ "has_#{type}_variable", to_ffi, name }
 
-			C.__send__ "get_#{type}_variable", name
+			C.__send__ "get_#{type}_variable", to_ffi, name
 		else
 			unless Types.has_key?(type)
 				name, aliases = Types.find { |name, aliases| aliases.member?(type) }
@@ -77,8 +89,8 @@ class API
 				type = name
 			end
 
-			if C.__send__ "has_#{type}_variable", name
-				C.__send__ "get_#{type}_variable", name
+			if C.__send__ "has_#{type}_variable", to_ffi, name
+				C.__send__ "get_#{type}_variable", to_ffi, name
 			end
 		end
 	end
@@ -116,6 +128,22 @@ class API
 		C::free_string(pointer)
 
 		result
+	end
+
+	def mean_text_confidence
+		C::mean_text_conf(to_ffi)
+	end
+
+	def all_word_confidences
+		C::all_word_confidences(to_ffi)
+	end
+
+	def clear
+		C::clear(to_ffi)
+	end
+
+	def end
+		C::end(to_ffi)
 	end
 
 	def to_ffi

@@ -29,12 +29,40 @@ module Tesseract
 
 class Engine
 	namedic :path, :language,
-		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT },
+		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {} },
 		:alias    => { :data => :path, :lang => :language }
-	def initialize (path = '.', language = :eng, mode = :DEFAULT)
+	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {})
 		@api = API.new
-		@api.init(path, language, mode)
+
+		@path      = path
+		@language  = language
+		@mode      = mode
+		@variables = variables
+
+		_init
 	end
+
+	def set (name, value)
+		@variables[name] = value
+
+		_init
+	end
+
+	def get (name)
+		@api.get_variable(name) || @variables[name]
+	end
+
+	%w(path language mode).each {|name|
+		define_method name do
+			instance_variable_get "@#{name}"
+		end
+
+		define_method "#{name}=" do |value|
+			instance_variable_set "@#{name}", value
+
+			_init
+		end
+	}
 
 	def image= (image)
 		@image = image
@@ -45,16 +73,7 @@ class Engine
 		:alias    => { :w => :width, :h => :height }
 	def text_for (image = nil, x = nil, y = nil, width = nil, height = nil)
 		image ||= @image or raise ArgumentError, 'you have to set an image first'
-
-		image = if image.is_a?(String) && File.exists?(File.expand_path(image))
-			C::pix_read(File.expand_path(image))
-		elsif image.is_a?(String)
-			C::pix_read_mem(image, image.bytesize)
-		elsif image.is_a?(IO)
-			C::pix_read_stream(image.to_i)
-		else
-			raise ArgumentError, 'invalid image'
-		end
+		image   = API.image_for(image)
 
 		x      ||= 0
 		y      ||= 0
@@ -64,7 +83,15 @@ class Engine
 		@api.set_image(image)
 		@api.set_rectangle(x, y, width, height)
 
-		@api.get_text.tap {
+		@api.get_text.tap {|text|
+			text.instance_exec(@api) {|api|
+				@confidence = api.mean_text_confidence
+
+				class << self
+					attr_reader :confidence
+				end
+			}
+
 			C::pix_destroy(image)
 		}
 	end
@@ -74,6 +101,48 @@ class Engine
 		:alias    => { :w => :width, :h => :height }
 	def text_at (x = nil, y = nil, width = nil, height = nil)
 		text_for(nil, x, y, width, height)
+	end
+
+	def words_for (*args)
+		_confidences(text_for(*args).split(/\s+/))
+	end
+
+	def words_at (*args)
+		_confidences(text_at(*args).split(/\s+/))
+	end
+
+private
+	def _init
+		@api.end
+
+		@variables.each {|name, value|
+			@api.set_variable(name.to_s, value.to_s)
+		}
+
+		@api.init(@path, @language, @mode)
+	end
+
+	def _confidences (words)
+		pointer = @api.all_word_confidences
+		current = 0
+
+		while (tmp = pointer.get_int(current)) != -1
+			break unless words[current]
+
+			words[current].instance_eval {
+				@confidence = tmp
+
+				class << self
+					attr_reader :confidence
+				end
+			}
+
+			current += 1
+		end
+
+		C::free_array_of_int(pointer)
+
+		words
 	end
 end
 
