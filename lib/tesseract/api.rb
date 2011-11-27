@@ -37,7 +37,15 @@ class API
 			C::pix_read_stream(image.to_i)
 		else
 			raise ArgumentError, 'invalid image'
-		end
+		end.tap {|image|
+			ObjectSpace.define_finalizer image, image_finalizer(image)
+		}
+	end
+
+	def self.image_finalizer (image)
+		proc {
+			C::pix_destroy(pointer)
+		}
 	end
 
 	def self.to_language_code (code)
@@ -87,7 +95,9 @@ class API
 		if type.nil?
 			type = Types.keys.find { |type| C.__send__ "has_#{type}_variable", to_ffi, name }
 
-			C.__send__ "get_#{type}_variable", to_ffi, name
+			if type
+				C.__send__ "get_#{type}_variable", to_ffi, name
+			end
 		else
 			unless Types.has_key?(type)
 				name, aliases = Types.find { |name, aliases| aliases.member?(type) }
@@ -133,6 +143,32 @@ class API
 		pointer = C::get_utf8_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
+		C::free_string(pointer)
+
+		result
+	end
+
+	def get_hocr (page = 0)
+		pointer = C::get_hocr_text(to_ffi, page)
+		result  = pointer.read_string
+		result.force_encoding 'UTF-8'
+
+		result
+	end
+
+	def get_box (page = 0)
+		pointer = C::get_box_text(to_ffi, page)
+		result  = pointer.read_string
+		result.force_encoding 'UTF-8'
+		C::free_string(pointer)
+
+		result
+	end
+
+	def get_unlv
+		pointer = C::get_unlv_text(to_ffi)
+		result  = pointer.read_string
+		result.force_encoding 'ISO8859-1'
 		C::free_string(pointer)
 
 		result
