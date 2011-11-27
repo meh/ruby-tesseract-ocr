@@ -15,7 +15,7 @@ Gem::Specification.new {|s|
 	s.require_paths = ['lib']
 
 	s.add_dependency 'namedic'
-	s.add_dependency 'iso_country_codes'
+	s.add_dependency 'iso-639'
 
 	s.add_dependency 'ffi-extra'
 	s.add_dependency 'ffi-inliner'

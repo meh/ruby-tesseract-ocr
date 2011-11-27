@@ -23,7 +23,7 @@
 #++
 
 require 'namedic'
-require 'iso_country_codes'
+require 'iso-639'
 require 'tesseract/c'
 
 module Tesseract
@@ -55,9 +55,9 @@ class API
 	##
 	# Transform a language code to tesseract-ocr usable codes
 	def self.to_language_code (code)
-		IsoCountryCodes.find(code).alpha3.downcase
+		ISO_639.find(code.to_s.downcase).alpha3
 	rescue
-		code
+		code.to_s
 	end
 
 	Types = {
@@ -117,8 +117,10 @@ class API
 		end
 	end
 
-	def init (datapath, language, mode = :DEFAULT)
-		C::init(to_ffi, datapath, language.to_s, mode)
+	def init (datapath = '.', language = 'eng', mode = :DEFAULT)
+		unless C::init(to_ffi, datapath, language.to_s, mode).zero?
+			raise 'the API did not Init correctly'
+		end
 	end
 
 	def read_config_file (path, init_only = false)
