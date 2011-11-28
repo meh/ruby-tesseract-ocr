@@ -53,13 +53,13 @@ class API
 				end
 			end
 
-			ObjectSpace.define_finalizer image, image_finalizer(image)
+			ObjectSpace.define_finalizer image, image_finalizer(image.address)
 		}
 	end
 
-	def self.image_finalizer (image) # :nodoc:
+	def self.image_finalizer (address) # :nodoc:
 		proc {
-			C::pix_destroy(pointer)
+			C::pix_destroy(FFI::Pointer.new(address))
 		}
 	end
 
