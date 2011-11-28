@@ -29,9 +29,9 @@ e.words_for('test/second.png') # => ["I'm", "12", "and", "what", "is", "this.", 
 e.with { |e| e.whitelist = '1234567890' }.text_for('test/second.png') # => "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234\n\n"
 ```
 
-You can pass to `#text_for` either a path, an IO object or a string containing the image,
-there are few supported formats so try to stay in the BMP/JPEG/PNG boundaries. This means
-that you can also work on an image with RMagick or similar and then pass the raw data.
+You can pass to `#text_for` either a path, an IO object, a string containing the image or
+an object that responds to `#to_blob` (for example  Magick::Image), keep in mind that
+the format has to be supported by leptonica.
 
 Using the binary
 ----------------
