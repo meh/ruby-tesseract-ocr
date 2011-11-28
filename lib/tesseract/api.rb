@@ -25,6 +25,8 @@
 require 'tesseract/extensions'
 require 'tesseract/c'
 
+require 'tesseract/api/iterator'
+
 module Tesseract
 
 class API
@@ -32,17 +34,17 @@ class API
 	# Get a pointer to a tesseract-ocr usable image from a path, a string
 	# with the data or an IO stream.
 	def self.image_for (image)
-		image = suppress_stderr {
+		image = STDERR.suppress {
 			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
-				C::pix_read(File.expand_path(image))
+				C::Leptonica.pix_read(File.expand_path(image))
 			elsif image.is_a?(String)
-				C::pix_read_mem(image, image.bytesize)
+				C::Leptonica.pix_read_mem(image, image.bytesize)
 			elsif image.is_a?(IO)
-				C::pix_read_stream(image.to_i)
+				C::Leptonica.pix_read_stream(image.to_i)
 			elsif image.respond_to? :to_blob
 				image = image.to_blob
 
-				C::pix_read_mem(image, image.bytesize)
+				C::Leptonica.pix_read_mem(image, image.bytesize)
 			end
 		}
 
@@ -52,11 +54,11 @@ class API
 
 		class << image
 			def width
-				C::pix_get_width(self)
+				C::Leptonica.pix_get_width(self)
 			end
 
 			def height
-				C::pix_get_height(self)
+				C::Leptonica.pix_get_height(self)
 			end
 		end
 
@@ -64,7 +66,7 @@ class API
 	end
 
 	def self.image_finalizer (pointer) # :nodoc:
-		C::pix_destroy(pointer)
+		C::Leptonica.pix_destroy(pointer)
 	end
 
 	##
@@ -83,35 +85,35 @@ class API
 	}
 
 	def initialize
-		@internal = FFI::AutoPointer.new(C::create, self.class.method(:finalizer))
+		@internal = FFI::AutoPointer.new(C::BaseAPI.create, self.class.method(:finalizer))
 	end
 
 	def self.finalizer (pointer) # :nodoc:
-		C::destroy(pointer)
+		C::BaseAPI.destroy(pointer)
 	end
 
 	def version
-		C::version(to_ffi)
+		C::BaseAPI.version(to_ffi)
 	end
 
 	def input_name= (name)
-		C::set_input_name(to_ffi, name)
+		C::BaseAPI.set_input_name(to_ffi, name)
 	end
 
 	def output_name= (name)
-		C::set_output_name(to_ffi, name)
+		C::BaseAPI.set_output_name(to_ffi, name)
 	end
 
 	def set_variable (name, value)
-		C::set_variable(to_ffi, name, value)
+		C::BaseAPI.set_variable(to_ffi, name, value)
 	end
 
 	def get_variable (name, type = nil)
 		if type.nil?
-			type = Types.keys.find { |type| C.__send__ "has_#{type}_variable", to_ffi, name }
+			type = Types.keys.find { |type| C::BaseAPI.__send__ "has_#{type}_variable", to_ffi, name }
 
 			if type
-				C.__send__ "get_#{type}_variable", to_ffi, name
+				C::BaseAPI.__send__ "get_#{type}_variable", to_ffi, name
 			end
 		else
 			unless Types.has_key?(type)
@@ -122,49 +124,53 @@ class API
 				type = name
 			end
 
-			if C.__send__ "has_#{type}_variable", to_ffi, name
-				C.__send__ "get_#{type}_variable", to_ffi, name
+			if C::BaseAPI.__send__ "has_#{type}_variable", to_ffi, name
+				C::BaseAPI.__send__ "get_#{type}_variable", to_ffi, name
 			end
 		end
 	end
 
 	def init (datapath = '.', language = 'eng', mode = :DEFAULT)
-		unless C::init(to_ffi, datapath, language.to_s, mode).zero?
+		unless C::BaseAPI.init(to_ffi, datapath, language.to_s, mode).zero?
 			raise 'the API did not Init correctly'
 		end
 	end
 
 	def read_config_file (path, init_only = false)
-		C::read_config_file(to_ffi, path, init_only)
+		C::BaseAPI.read_config_file(to_ffi, path, init_only)
 	end
 
 	def page_seg_mode
-		C::get_page_seg_mode(to_ffi)
+		C::BaseAPI.get_page_seg_mode(to_ffi)
 	end
 
 	def page_seg_mode= (value)
-		C::set_page_seg_mode(to_ffi, value)
+		C::BaseAPI.set_page_seg_mode(to_ffi, value)
 	end
 
 	def set_image (pix)
-		C::set_image(to_ffi, pix)
+		C::BaseAPI.set_image(to_ffi, pix)
 	end
 
 	def set_rectangle (left, top, width, height)
-		C::set_rectangle(to_ffi, left, top, width, height)
+		C::BaseAPI.set_rectangle(to_ffi, left, top, width, height)
+	end
+
+	def get_iterator
+		Iterator.new(C::BaseAPI.get_iterator(to_ffi))
 	end
 
 	def get_text
-		pointer = C::get_utf8_text(to_ffi)
+		pointer = C::BaseAPI.get_utf8_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C::free_string(pointer)
+		C::BaseAPI.free_string(pointer)
 
 		result
 	end
 
 	def get_hocr (page = 0)
-		pointer = C::get_hocr_text(to_ffi, page)
+		pointer = C::BaseAPI.get_hocr_text(to_ffi, page)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
 
@@ -172,37 +178,37 @@ class API
 	end
 
 	def get_box (page = 0)
-		pointer = C::get_box_text(to_ffi, page)
+		pointer = C::BaseAPI.get_box_text(to_ffi, page)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C::free_string(pointer)
+		C::BaseAPI.free_string(pointer)
 
 		result
 	end
 
 	def get_unlv
-		pointer = C::get_unlv_text(to_ffi)
+		pointer = C::BaseAPI.get_unlv_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'ISO8859-1'
-		C::free_string(pointer)
+		C::BaseAPI.free_string(pointer)
 
 		result
 	end
 
 	def mean_text_confidence
-		C::mean_text_conf(to_ffi)
+		C::BaseAPI.mean_text_conf(to_ffi)
 	end
 
 	def all_word_confidences
-		C::all_word_confidences(to_ffi)
+		C::BaseAPI.all_word_confidences(to_ffi)
 	end
 
 	def clear
-		C::clear(to_ffi)
+		C::BaseAPI.clear(to_ffi)
 	end
 
 	def end
-		C::end(to_ffi)
+		C::BaseAPI.end(to_ffi)
 	end
 
 	def to_ffi

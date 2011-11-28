@@ -22,6 +22,20 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
-require 'iso-639'
-require 'io/manage'
+module Tesseract; class API
+
+class Iterator
+	def initialize (pointer)
+		@internal = FFI::AutoPointer.new(pointer, self.class.method(:finalize))
+	end
+
+	def self.finalize (pointer) # :nodoc:
+		C::Iterator.destroy(pointer)
+	end
+
+	def to_ffi
+		@internal
+	end
+end
+
+end; end

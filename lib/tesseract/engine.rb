@@ -23,6 +23,7 @@
 #++
 
 require 'tesseract/api'
+require 'tesseract/iterator'
 
 module Tesseract
 
@@ -32,11 +33,12 @@ class Engine
 	namedic :path, :language, :mode, :variables,
 		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {}, :config => [] },
 		:alias    => { :data => :path, :lang => :language }
-	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}, config = []) # :yields: self
+	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}, config = [], &block) # :yields: self
 		@api = API.new
 
 		@initializing = true
 
+		@init      = block
 		@path      = path
 		@language  = language
 		@mode      = mode
@@ -65,7 +67,10 @@ class Engine
 	end
 
 	def with (&block) # :yields: self
-		self.class.new(@path, @language, @mode, @variables.clone, &block)
+		self.class.new(@path, @language, @mode, @variables.clone, @config.clone) {|e|
+			@init.call(e) if @init
+			block.call(e) if block
+		}
 	end
 
 	def set (name, value)
@@ -126,20 +131,7 @@ class Engine
 		:optional => 0 .. -1,
 		:alias    => { :w => :width, :h => :height }
 	def text_for (image = nil, x = nil, y = nil, width = nil, height = nil)
-		image ||= @image or raise ArgumentError, 'you have to set an image first'
-		image   = API.image_for(image)
-
-		x      ||= 0
-		y      ||= 0
-		width  ||= image.width
-		height ||= image.height
-
-		if (x + width) > image.width || (y + height) > image.height
-			raise IndexError, 'image access out of boundaries'
-		end
-
-		@api.set_image(image)
-		@api.set_rectangle(x, y, width, height)
+		_setup(image, x, y, width, height)
 
 		@api.get_text.tap {|text|
 			text.instance_exec(@api) {|api|
@@ -172,21 +164,9 @@ class Engine
 		:optional => 0 .. -1,
 		:alias    => { :w => :width, :h => :height }
 	def chars_for (image = nil, page = nil, x = nil, y = nil, width = nil, height = nil)
-		image ||= @image or raise ArgumentError, 'you have to set an image first'
-		image   = API.image_for(image)
+		_setup(image, x, y, width, height)
 
-		page   ||= 0
-		x      ||= 0
-		y      ||= 0
-		width  ||= image.width
-		height ||= image.height
-
-		if (x + width) > image.width || (y + height) > image.height
-			raise IndexError, 'image access out of boundaries'
-		end
-
-		@api.set_image(image)
-		@api.set_rectangle(x, y, width, height)
+		page ||= 0
 
 		@api.get_box(page).lines.map {|line|
 			char, x, y, width, height, page = line.chomp.split ' '
@@ -214,7 +194,7 @@ class Engine
 		chars_for(nil, page, x, y, width, height)
 	end
 
-private
+protected
 	def _init
 		@api.end
 
@@ -227,6 +207,31 @@ private
 		@config.each {|conf|
 			@api.read_config_file(conf)
 		}
+	end
+
+	def _setup (image = nil, x = nil, y = nil, width = nil, height = nil)
+		image ||= @image or raise ArgumentError, 'you have to set an image first'
+		image   = API.image_for(image)
+
+		if !width && x
+			width = image.width - x
+		end
+
+		if !height && y
+			height = image.height - y
+		end
+
+		x      ||= 0
+		y      ||= 0
+		width  ||= image.width
+		height ||= image.height
+
+		if (x + width) > image.width || (y + height) > image.height
+			raise IndexError, 'image access out of boundaries'
+		end
+
+		@api.set_image(image)
+		@api.set_rectangle(x, y, width, height)
 	end
 
 	def _confidences (words)
@@ -247,9 +252,17 @@ private
 			current += 1
 		end
 
-		C::free_array_of_int(pointer)
+		C::BaseAPI.free_array_of_int(pointer)
 
 		words
+	end
+
+	def _new_api
+		old, @api = @api, API.new
+
+		_init
+
+		old
 	end
 end
 

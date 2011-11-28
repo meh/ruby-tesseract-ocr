@@ -22,6 +22,17 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
-require 'iso-639'
-require 'io/manage'
+module Tesseract
+
+class Iterator
+	def initialize (api, pointer)
+		@api      = api
+		@internal = pointer
+	end
+
+	def to_ffi
+		@internal
+	end
+end
+
+end

@@ -22,6 +22,51 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
-require 'iso-639'
-require 'io/manage'
+module Tesseract; module C
+
+module Leptonica
+	extend FFI::Inliner
+
+	inline 'C++' do |cpp|
+		cpp.include   'leptonica/allheaders.h'
+		cpp.libraries 'lept'
+
+		cpp.function %{
+			Pix* pix_read (const char* path) {
+				return pixRead(path);
+			}
+		}
+
+		cpp.function %{
+			Pix* pix_read_fd (int fd) {
+				return pixReadStream(fdopen(fd, "rb"), 0);
+			}
+		}
+
+		cpp.function %{
+			Pix* pix_read_mem (const l_uint8* data, size_t size) {
+				return pixReadMem(data, size);
+			}
+		}
+
+		cpp.function %{
+			void pix_destroy (Pix* pix) {
+				pixDestroy(&pix);
+			}
+		}
+
+		cpp.function %{
+			int32_t pix_get_width (Pix* pix) {
+				return pixGetWidth(pix);
+			}
+		}
+
+		cpp.function %{
+			int32_t pix_get_height (Pix* pix) {
+				return pixGetHeight(pix);
+			}
+		}
+	end
+end
+
+end; end

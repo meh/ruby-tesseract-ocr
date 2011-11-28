@@ -118,13 +118,13 @@ describe Tesseract::Engine do
 	
 	describe '#blacklist' do
 		it 'works with removing weird signs' do
-			engine.with { |e| e.blacklist '|' }.text_for('second.png').strip.should == "I'm 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
+			engine.with { |e| e.blacklist = '|' }.text_for('second.png').strip.should == "I'm 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
 		end
 	end
 
 	describe '#whitelist' do
 		it 'makes everything into a number' do
-			engine.with { |e| e.whitelist '1234567890' }.text_for('second.png').strip.should == "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234"
+			engine.with { |e| e.whitelist = '1234567890' }.text_for('second.png').strip.should == "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234"
 		end
 	end
 end
