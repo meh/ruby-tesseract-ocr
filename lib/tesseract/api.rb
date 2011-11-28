@@ -32,7 +32,7 @@ class API
 	# Get a pointer to a tesseract-ocr usable image from a path, a string
 	# with the data or an IO stream.
 	def self.image_for (image)
-		suppress_stderr {
+		image = suppress_stderr {
 			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
 				C::pix_read(File.expand_path(image))
 			elsif image.is_a?(String)
@@ -40,27 +40,27 @@ class API
 			elsif image.is_a?(IO)
 				C::pix_read_stream(image.to_i)
 			end
-		}.tap {|image|
-			raise ArgumentError, 'invalid image' if image.nil? || image.null?
+		}
 
-			class << image
-				def width
-					C::pix_get_width(self)
-				end
+		raise ArgumentError, 'invalid image' if image.nil? || image.null?
 
-				def height
-					C::pix_get_height(self)
-				end
+		image = FFI::AutoPointer.new(image, method(:image_finalizer))
+
+		class << image
+			def width
+				C::pix_get_width(self)
 			end
 
-			ObjectSpace.define_finalizer image, image_finalizer(image.address)
-		}
+			def height
+				C::pix_get_height(self)
+			end
+		end
+
+		image
 	end
 
-	def self.image_finalizer (address) # :nodoc:
-		proc {
-			C::pix_destroy(FFI::Pointer.new(address))
-		}
+	def self.image_finalizer (pointer) # :nodoc:
+		C::pix_destroy(pointer)
 	end
 
 	##
@@ -79,15 +79,11 @@ class API
 	}
 
 	def initialize
-		@internal = C::create
-
-		ObjectSpace.define_finalizer self, self.class.finalizer(to_ffi)
+		@internal = FFI::AutoPointer.new(C::create, self.class.method(:finalizer))
 	end
 
 	def self.finalizer (pointer) # :nodoc:
-		proc {
-			C::destroy(pointer)
-		}
+		C::destroy(pointer)
 	end
 
 	def version
