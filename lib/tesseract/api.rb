@@ -39,6 +39,10 @@ class API
 				C::pix_read_mem(image, image.bytesize)
 			elsif image.is_a?(IO)
 				C::pix_read_stream(image.to_i)
+			elsif image.respond_to? :to_blob
+				image = image.to_blob
+
+				C::pix_read_mem(image, image.bytesize)
 			end
 		}
 

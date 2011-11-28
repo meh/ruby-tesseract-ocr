@@ -30,9 +30,9 @@ module Kernel
 		old = IO.pipe.last.reopen($stderr)
 
 		$stderr.reopen(IO.pipe.last)
-		result = yield
-		$stderr.reopen(old)
 
-		result
+		yield
+	ensure
+		$stderr.reopen(old)
 	end
 end
