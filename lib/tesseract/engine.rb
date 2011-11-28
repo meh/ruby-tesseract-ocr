@@ -22,7 +22,6 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
 require 'tesseract/api'
 
 module Tesseract

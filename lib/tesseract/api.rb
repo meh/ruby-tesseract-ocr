@@ -22,7 +22,7 @@
 # or implied, of meh.
 #++
 
-require 'iso-639'
+require 'tesseract/extensions'
 require 'tesseract/c'
 
 module Tesseract
@@ -32,15 +32,17 @@ class API
 	# Get a pointer to a tesseract-ocr usable image from a path, a string
 	# with the data or an IO stream.
 	def self.image_for (image)
-		if image.is_a?(String) && File.exists?(File.expand_path(image))
-			C::pix_read(File.expand_path(image))
-		elsif image.is_a?(String)
-			C::pix_read_mem(image, image.bytesize)
-		elsif image.is_a?(IO)
-			C::pix_read_stream(image.to_i)
-		else
-			raise ArgumentError, 'invalid image'
-		end.tap {|image|
+		suppress_stderr {
+			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
+				C::pix_read(File.expand_path(image))
+			elsif image.is_a?(String)
+				C::pix_read_mem(image, image.bytesize)
+			elsif image.is_a?(IO)
+				C::pix_read_stream(image.to_i)
+			end
+		}.tap {|image|
+			raise ArgumentError, 'invalid image' if image.nil? || image.null?
+
 			class << image
 				def width
 					C::pix_get_width(self)

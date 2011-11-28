@@ -44,7 +44,7 @@ module C
 
 		cpp.function %{
 			Pix* pix_read_fd (int fd) {
-				return pixReadStream(fdopen(fd, "r"), 0);
+				return pixReadStream(fdopen(fd, "rb"), 0);
 			}
 		}
 
