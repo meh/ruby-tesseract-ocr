@@ -56,6 +56,14 @@ module Iterator
 					:bottom, :int
 			}
 
+			Baseline = Class.new(FFI::Struct) {
+				layout \
+					:x1, :int,
+					:y1, :int,
+					:x2, :int,
+					:y2, :int
+			}
+
 			Orientation = Class.new(FFI::Struct) {
 				layout \
 					:orientation,       orientation,
@@ -65,6 +73,7 @@ module Iterator
 			}
 
 			typedef BoundingBox.by_value, :BoundingBox
+			typedef Baseline.by_value,    :Baseline
 			typedef Orientation.by_value, :OrientationResult
 		}
 
@@ -75,6 +84,13 @@ module Iterator
 				int right;
 				int bottom;
 			} BoundingBox;
+
+			typedef struct Baseline {
+				int x1;
+				int y1;
+				int x2;
+				int y1;
+			} Baseline;
 
 			typedef struct OrientationResult {
 				Orientation      orientation;
@@ -135,6 +151,16 @@ module Iterator
 				OrientationResult result;
 				
 				it->Orientation(&result.orientation, &result.writing_direction, &result.textline_order, &result.deskew_angle);
+
+				return result;
+			}
+		}
+
+		cpp.function %{
+			Baseline baseline (PageIterator* it, PageIteratorLevel level) {
+				Baseline result;
+
+				it->Baseline(level, &result.x1, &result.y1, &result.x2, &result.y2);
 
 				return result;
 			}
