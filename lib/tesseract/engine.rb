@@ -171,6 +171,23 @@ class Engine
 		define_method "#{level}s" do
 			_iterator.__send__ "#{level}s"
 		end
+
+		namedic :image, :x, :y, :width, :height,
+			:optional => 0 .. -1,
+			:alias    => { :w => :width, :h => :height }
+		define_method "#{level}s_for" do |image = nil, x = nil, y = nil, width = nil, height = nil|
+			self.image = image if image
+			select x, y, width, height
+
+			__send__("#{level}s")
+		end
+
+		namedic :x, :y, :width, :height,
+			:optional => 0 .. -1,
+			:alias    => { :w => :width, :h => :height }
+		define_method "#{level}s_at" do |x = nil, y = nil, width = nil, height = nil|
+			__send__("#{level}s_for", nil, x, y, width, height)
+		end
 	}
 
 protected

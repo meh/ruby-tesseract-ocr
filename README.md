@@ -24,13 +24,22 @@ e = Tesseract::Engine.new {|e|
 }
 
 e.text_for('test/first.png').strip # => 'ABC'
-e.words_for('test/second.png') # => ["I'm", "12", "and", "what", "is", "this.", "INSTALL", "GENTOO", "OH", "HAI", "1234"]
 
-e.with { |e| e.whitelist = '1234567890' }.text_for('test/second.png') # => "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234\n\n"
+e.image = 'test/second.png'
 
-e.each_symbol {|symbol|
-
-}
+e.words # [
+        #      [ 0] #<Tesseract(93.41653442382812): "|'m">,
+        #      [ 1] #<Tesseract(91.11811828613281): "12">,
+        #      [ 2] #<Tesseract(85.71760559082031): "and">,
+        #      [ 3] #<Tesseract(83.4853515625): "what">,
+        #      [ 4] #<Tesseract(86.71072387695312): "is">,
+        #      [ 5] #<Tesseract(83.2227783203125): "this.">,
+        #      [ 6] #<Tesseract(82.81439208984375): "INSTALL">,
+        #      [ 7] #<Tesseract(86.46566772460938): "GENTOO">,
+        #      [ 8] #<Tesseract(93.19613647460938): "OH">,
+        #      [ 9] #<Tesseract(82.81439208984375): "HAI">,
+        #      [10] #<Tesseract(85.9158935546875): "1234">
+        #  ]
 ```
 
 You can pass to `#text_for` either a path, an IO object, a string containing the image or
