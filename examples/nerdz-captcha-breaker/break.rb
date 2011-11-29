@@ -51,6 +51,8 @@ Tesseract::Engine.new.tap {|engine|
 			image.pixel_color x, y, 'black'
 		}
 
+		File.open('/tmp/lol.png', ?w) { |f| f.write(image.resize(10).to_blob) }
+
 		puts engine.text_for(image.resize 10).strip
 	}
 }

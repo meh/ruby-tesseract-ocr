@@ -75,6 +75,10 @@ class Engine
 		}
 	end
 
+	def train (path)
+		@api.set_input_file(path)
+	end
+
 	def set (name, value)
 		@variables[name] = value
 
