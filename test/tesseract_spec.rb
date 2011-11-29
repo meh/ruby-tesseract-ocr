@@ -127,4 +127,10 @@ describe Tesseract::Engine do
 			engine.with { |e| e.whitelist = '1234567890' }.text_for('second.png').strip.should == "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234"
 		end
 	end
+
+	describe '#each_block' do
+		it 'works properly with first image' do
+
+		end
+	end
 end

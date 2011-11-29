@@ -26,6 +26,8 @@ module Tesseract; class API
 
 class Iterator
 	def initialize (pointer)
+		raise ArgumentError, 'the pointer is null' if pointer.nil? || pointer.null?
+
 		@internal = FFI::AutoPointer.new(pointer, self.class.method(:finalize))
 	end
 
@@ -41,8 +43,8 @@ class Iterator
 		C::Iterator.is_at_beginning_of(to_ffi, C.for_enum(level))
 	end
 
-	def end? (level = :word)
-		C::Iterator.is_at_final_element(to_ffi, C.for_enum(level))
+	def end? (level, element)
+		C::Iterator.is_at_final_element(to_ffi, C.for_enum(level), C.for_enum(element))
 	end
 
 	def next (level = :word)
@@ -53,16 +55,12 @@ class Iterator
 		C::Iterator.bounding_box(to_ffi, C.for_enum(level))
 	end
 
-	def block_type
-		C::Iterator.block_type(to_ffi)
-	end
-
 	def get_binary_image (level = :word)
 		Image.new(C::Iterator.get_binary_image(to_ffi, C.for_enum(level)))
 	end
 
-	def get_image (level = :word)
-		image = C::Iterator.get_image(to_ffi, C.for_enum(level))
+	def get_image (level = :word, padding = 0)
+		image = C::Iterator.get_image(to_ffi, C.for_enum(level), padding)
 
 		Image.new(image.pix, image.x, image.y)
 	end
@@ -86,6 +84,10 @@ class Iterator
 
 	def confidence (level = :word)
 		C::Iterator.confidence(to_ffi, C.for_enum(level))
+	end
+
+	def block_type
+		C::Iterator.block_type(to_ffi)
 	end
 
 	def word_font_attributes

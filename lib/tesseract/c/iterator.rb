@@ -42,7 +42,7 @@ module Iterator
 			]
 
 			enum :PageIteratorLevel, [
-				:BLOCK, :PARAGRAPH, :TEXTLINE, :WORD, :SYMBOL
+				:BLOCK, :PARAGRAPH, :LINE, :WORD, :SYMBOL
 			]
 
 			orientation = enum :UP, :RIGHT, :DOWN, :LEFT

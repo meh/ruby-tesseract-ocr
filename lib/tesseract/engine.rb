@@ -23,7 +23,8 @@
 #++
 
 require 'tesseract/api'
-require 'tesseract/iterator'
+
+require 'tesseract/engine/iterator'
 
 module Tesseract
 
@@ -44,6 +45,7 @@ class Engine
 		@mode      = mode
 		@variables = variables
 		@config    = config
+		@rectangle = []
 
 		yield self if block_given?
 
@@ -116,11 +118,18 @@ class Engine
 	end
 
 	def page_segmentation_mode= (value)
-		@api.page_seg_mode = C.for_enum(value)
+		@api.set_page_seg_mode C.for_enum(value)
 	end
 
 	def image= (image)
 		@image = image
+	end
+
+	namedic :x, :y, :width, :height,
+		:optional => 0 .. -1,
+		:alias    => { :w => :width, :h => :height }
+	def select (x = nil, y = nil, width = nil, height = nil)
+		@rectangle = [x, y, width, height]
 	end
 
 	namedic :image, :x, :y, :width, :height,
@@ -148,47 +157,21 @@ class Engine
 		text_for(nil, x, y, width, height)
 	end
 
-	def words_for (*args)
-		_confidences(text_for(*args).split(/\s+/))
+	def text
+		text_at
 	end
 
-	def words_at (*args)
-		_confidences(text_at(*args).split(/\s+/))
-	end
+	%w(block paragraph line word symbol).each {|level|
+		define_method "each_#{level}" do |&block|
+			raise ArgumentError, 'you have to pass a block' unless block
 
-	namedic :image, :page, :x, :y, :width, :height,
-		:optional => 0 .. -1,
-		:alias    => { :w => :width, :h => :height }
-	def chars_for (image = nil, page = nil, x = nil, y = nil, width = nil, height = nil)
-		_setup(image, x, y, width, height)
+			_iterator.__send__ "each_#{level}", &block
+		end
 
-		page ||= 0
-
-		@api.get_box(page).lines.map {|line|
-			char, x, y, width, height, page = line.chomp.split ' '
-
-			char.instance_eval {
-				@x      = x.to_i
-				@y      = y.to_i
-				@width  = width.to_i
-				@height = height.to_i
-				@page   = page.to_i
-
-				class << self
-					attr_reader :x, :y, :width, :height, :page
-				end
-			}
-
-			char
-		}
-	end
-
-	namedic :page, :x, :y, :width, :height,
-		:optional => 0 .. -1,
-		:alias    => { :w => :width, :h => :height }
-	def chars_at (page = nil, x = nil, y = nil, width = nil, height = nil)
-		chars_for(nil, page, x, y, width, height)
-	end
+		define_method "#{level}s" do
+			_iterator.__send__ "#{level}s"
+		end
+	}
 
 protected
 	def _init
@@ -217,10 +200,10 @@ protected
 			height = image.height - y
 		end
 
-		x      ||= 0
-		y      ||= 0
-		width  ||= image.width
-		height ||= image.height
+		x      ||= @rectangle[0] || 0
+		y      ||= @rectangle[1] || 0
+		width  ||= @rectangle[2] || image.width
+		height ||= @rectangle[3] || image.height
 
 		if (x + width) > image.width || (y + height) > image.height
 			raise IndexError, 'image access out of boundaries'
@@ -230,35 +213,16 @@ protected
 		@api.set_rectangle(x, y, width, height)
 	end
 
-	def _confidences (words)
-		pointer = @api.all_word_confidences
-		current = 0
+	def _recognize
+		_setup
 
-		while (tmp = pointer.get_int(current)) != -1
-			break unless words[current]
-
-			words[current].instance_eval {
-				@confidence = tmp
-
-				class << self
-					attr_reader :confidence
-				end
-			}
-
-			current += 1
-		end
-
-		C.free_array_of_int(pointer)
-
-		words
+		@api.get_text
 	end
 
-	def _new_api
-		old, @api = @api, API.new
+	def _iterator
+		_recognize
 
-		_init
-
-		old
+		Iterator.new(@api.get_iterator)
 	end
 end
 

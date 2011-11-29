@@ -54,10 +54,10 @@ class API
 	}
 
 	def initialize
-		@internal = FFI::AutoPointer.new(C::BaseAPI.create, self.class.method(:finalizer))
+		@internal = FFI::AutoPointer.new(C::BaseAPI.create, self.class.method(:finalize))
 	end
 
-	def self.finalizer (pointer) # :nodoc:
+	def self.finalize (pointer) # :nodoc:
 		C::BaseAPI.destroy(pointer)
 	end
 
@@ -109,11 +109,11 @@ class API
 		C::BaseAPI.read_config_file(to_ffi, path, init_only)
 	end
 
-	def page_seg_mode
+	def get_page_seg_mode
 		C::BaseAPI.get_page_seg_mode(to_ffi)
 	end
 
-	def page_seg_mode= (value)
+	def set_page_seg_mode (value)
 		C::BaseAPI.set_page_seg_mode(to_ffi, value)
 	end
 
@@ -134,14 +134,6 @@ class API
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
 		C.free_string(pointer)
-
-		result
-	end
-
-	def get_hocr (page = 0)
-		pointer = C::BaseAPI.get_hocr_text(to_ffi, page)
-		result  = pointer.read_string
-		result.force_encoding 'UTF-8'
 
 		result
 	end

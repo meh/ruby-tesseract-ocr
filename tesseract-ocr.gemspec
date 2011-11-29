@@ -15,6 +15,7 @@ Gem::Specification.new {|s|
 	s.require_paths = ['lib']
 
 	s.add_dependency 'namedic'
+	s.add_dependency 'memoized'
 	s.add_dependency 'iso-639'
 	s.add_dependency 'io-manage'
 
