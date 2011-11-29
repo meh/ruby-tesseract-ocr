@@ -7,4 +7,5 @@ task :test do
 	Dir.chdir 'test'
 
 	sh 'rspec tesseract_spec.rb --color --format doc'
+	sh 'ruby tesseract_bench.rb'
 end
