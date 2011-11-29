@@ -78,9 +78,33 @@ describe Tesseract::Engine do
 		end
 	end
 
-	describe '#each_block' do
+	describe '#blocks' do
 		it 'works properly with first image' do
+			engine.blocks_for('first.png').first.to_s.should == "ABC\n"
+		end
+	end
 
+	describe '#paragraphs' do
+		it 'works properly with first image' do
+			engine.paragraphs_for('first.png').first.to_s.should == "ABC\n"
+		end
+	end
+
+	describe '#lines' do
+		it 'works properly with first image' do
+			engine.lines_for('first.png').first.to_s.should == "ABC\n"
+		end
+	end
+
+	describe '#words' do
+		it 'works properly with first image' do
+			engine.words_for('first.png').first.to_s.should == 'ABC'
+		end
+	end
+
+	describe '#symbols' do
+		it 'works properly with first image' do
+			engine.symbols_for('first.png').first.to_s.should == 'A'
 		end
 	end
 end
