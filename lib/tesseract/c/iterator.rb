@@ -27,22 +27,6 @@ module Tesseract; module C
 module Iterator
 	extend FFI::Inliner
 
-	class BoundingBox < FFI::Struct
-		layout \
-			:left,   :int,
-			:top,    :int,
-			:right,  :int,
-			:bottom, :int
-	end
-
-	class Orientation < FFI::Struct
-		layout \
-			:orientation,       FFI::Enum.new([:UP, :RIGHT, :DOWN, :LEFT]),
-			:writing_direction, FFI::Enum.new([:LEFT_TO_RIGHT, :RIGHT_TO_LEFT, :TOP_TO_BOTTOM]),
-			:textline_order,    FFI::Enum.new([:LEFT_TO_RIGHT, :RIGHT_TO_LEFT, :TOP_TO_BOTTOM]),
-			:deskew_angle,      :float
-	end
-
 	inline 'C++' do |cpp|
 		cpp.include   'tesseract/resultiterator.h'
 		cpp.libraries 'tesseract'
@@ -60,6 +44,28 @@ module Iterator
 			enum :PageIteratorLevel, [
 				:BLOCK, :PARA, :TEXTLINE, :WORD, :SYMBOL
 			]
+
+			orientation = enum :UP, :RIGHT, :DOWN, :LEFT
+			direction   = enum :LEFT_TO_RIGHT, :RIGHT_TO_LEFT, :TOP_TO_BOTTOM
+
+			BoundingBox = Class.new(FFI::Struct) {
+				layout \
+					:left,   :int,
+					:top,    :int,
+					:right,  :int,
+					:bottom, :int
+			}
+
+			Orientation = Class.new(FFI::Struct) {
+				layout \
+					:orientation,       orientation,
+					:writing_direction, direction,
+					:textline_order,    direction,
+					:deskew_angle,      :float
+			}
+
+			typedef BoundingBox.by_value, :BoundingBox
+			typedef Orientation.by_value, :OrientationResult
 		}
 
 		cpp.raw %{
@@ -116,7 +122,7 @@ module Iterator
 				
 				return result;
 			}
-		}, return: BoundingBox.by_value
+		}
 
 		cpp.function %{
 			PolyBlockType block_type (PageIterator* it) {
@@ -132,7 +138,7 @@ module Iterator
 
 				return result;
 			}
-		}, return: Orientation.by_value
+		}
 	end
 end
 
