@@ -21,9 +21,9 @@ Benchmark.bm do |b|
 		end
 	end
 
-	b.report 'chars_for: ' do
+	b.report 'symbols_for: ' do
 		100.times do
-			engine.chars_for('first.png')
+			engine.symbols_for('first.png')
 
 			GC.start
 		end

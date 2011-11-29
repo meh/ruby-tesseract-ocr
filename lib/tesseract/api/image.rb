@@ -26,19 +26,17 @@ module Tesseract; class API
 
 class Image
 	def self.new (image)
-		image = STDERR.suppress {
-			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
-				C::Leptonica.pix_read(File.expand_path(image))
-			elsif image.is_a?(String)
-				C::Leptonica.pix_read_mem(image, image.bytesize)
-			elsif image.is_a?(IO)
-				C::Leptonica.pix_read_stream(image.to_i)
-			elsif image.respond_to? :to_blob
-				image = image.to_blob
+		image = if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
+			C::Leptonica.pix_read(File.expand_path(image))
+		elsif image.is_a?(String)
+			C::Leptonica.pix_read_mem(image, image.bytesize)
+		elsif image.is_a?(IO)
+			C::Leptonica.pix_read_stream(image.to_i)
+		elsif image.respond_to? :to_blob
+			image = image.to_blob
 
-				C::Leptonica.pix_read_mem(image, image.bytesize)
-			end
-		}
+			C::Leptonica.pix_read_mem(image, image.bytesize)
+		end
 
 		raise ArgumentError, 'invalid image' if image.nil? || image.null?
 

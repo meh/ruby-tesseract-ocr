@@ -80,7 +80,7 @@ class Iterator
 		alias to_s text
 
 		def inspect
-			"#<Tesseract(#{confidence}): #{text.inspect}>"
+			"#<Tesseract::#{@level.capitalize}(#{confidence}): #{text.inspect}>"
 		end
 	end
 
@@ -146,6 +146,10 @@ class Iterator
 					if e.respond_to? "__memoized_#{name}"
 						e.__send__ name
 					end
+				}
+
+				e.instance_eval {
+					@iterator = nil
 				}
 
 				e
