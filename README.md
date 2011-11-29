@@ -19,27 +19,25 @@ Example
 require 'tesseract'
 
 e = Tesseract::Engine.new {|e|
-	e.language  = :eng
-	e.blacklist = '|'
+  e.language  = :eng
+  e.blacklist = '|'
 }
 
 e.text_for('test/first.png').strip # => 'ABC'
 
-e.image = 'test/second.png'
-
-e.words # [
-        #      [ 0] #<Tesseract(93.41653442382812): "|'m">,
-        #      [ 1] #<Tesseract(91.11811828613281): "12">,
-        #      [ 2] #<Tesseract(85.71760559082031): "and">,
-        #      [ 3] #<Tesseract(83.4853515625): "what">,
-        #      [ 4] #<Tesseract(86.71072387695312): "is">,
-        #      [ 5] #<Tesseract(83.2227783203125): "this.">,
-        #      [ 6] #<Tesseract(82.81439208984375): "INSTALL">,
-        #      [ 7] #<Tesseract(86.46566772460938): "GENTOO">,
-        #      [ 8] #<Tesseract(93.19613647460938): "OH">,
-        #      [ 9] #<Tesseract(82.81439208984375): "HAI">,
-        #      [10] #<Tesseract(85.9158935546875): "1234">
-        #  ]
+e.words_for('test/second.png') # [
+                               #      [ 0] #<Tesseract(93.41653442382812): "|'m">,
+                               #      [ 1] #<Tesseract(91.11811828613281): "12">,
+                               #      [ 2] #<Tesseract(85.71760559082031): "and">,
+                               #      [ 3] #<Tesseract(83.4853515625): "what">,
+                               #      [ 4] #<Tesseract(86.71072387695312): "is">,
+                               #      [ 5] #<Tesseract(83.2227783203125): "this.">,
+                               #      [ 6] #<Tesseract(82.81439208984375): "INSTALL">,
+                               #      [ 7] #<Tesseract(86.46566772460938): "GENTOO">,
+                               #      [ 8] #<Tesseract(93.19613647460938): "OH">,
+                               #      [ 9] #<Tesseract(82.81439208984375): "HAI">,
+                               #      [10] #<Tesseract(85.9158935546875): "1234">
+                               #  ]
 ```
 
 You can pass to `#text_for` either a path, an IO object, a string containing the image or
