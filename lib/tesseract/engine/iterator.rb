@@ -22,6 +22,11 @@
 # or implied, of meh.
 #++
 
+require 'tesseract/engine/bounding_box'
+require 'tesseract/engine/baseline'
+require 'tesseract/engine/orientation'
+require 'tesseract/engine/font_attributes'
+
 module Tesseract; class Engine
 
 class Iterator
@@ -39,7 +44,7 @@ class Iterator
 
 		memoize
 		def bounding_box
-			@iterator.bounding_box(@level)
+			BoundingBox.new(@iterator.bounding_box(@level))
 		end
 
 		memoize
@@ -54,12 +59,12 @@ class Iterator
 
 		memoize
 		def baseline
-			@iterator.baseline(@level)
+			Baseline.new(@iterator.baseline(@level))
 		end
 
 		memoize
 		def orientation
-			@iterator.orientation
+			Orientation.new(@iterator.orientation)
 		end
 
 		memoize
@@ -89,7 +94,7 @@ class Iterator
 	class Word < Element
 		memoize
 		def font_attributes
-			@iterator.word_font_attributes
+			FontAttributes.new(@iterator.word_font_attributes)
 		end
 
 		memoize

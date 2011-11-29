@@ -42,80 +42,30 @@ describe Tesseract::Engine do
 		end
 	end
 
-	describe '#words_for' do
-		it 'can read the first test image' do
-			engine.words_for('first.png').should == ['ABC']
-		end
-
-		it 'can read the second test image' do
-			engine.words_for('second.png').should == %w(|'m 12 and what is this. INSTALL GENTOO OH HAI 1234)
-		end
-
-		it 'raises when going out of the image boundaries' do
-			expect {
-				engine.words_for('second.png', 0, 0, 1000, 1000)
-			}.should raise_error
-		end
-	end
-
-	describe '#words_at' do
+	describe '#text' do
 		it 'can read the first test image' do
 			engine.image = 'first.png'
-			engine.words_at(2, 2, 2, 2).should == []
+			engine.select 2, 2, 2, 2
+
+			engine.text.strip.should == ''
 		end
 
 		it 'can read the second test image' do
 			engine.image = 'second.png'
-			engine.words_at(242, 191, 129, 31).should == %w(OH HAI 1234)
+			engine.select 242, 191, 129, 31
+			engine.text.strip.should == 'OH HAI 1234'
 		end
 
 		it 'raises when going out of the image boundaries' do
 			expect {
 				engine.image = 'second.png'
-				engine.words_at(10, 20, 1000, 1000)
+				engine.select 10, 20, 1000, 1000
+				engine.text
 			}.should raise_error
 		end
+
 	end
 
-	describe '#chars_for' do
-		it 'can read the first test image' do
-			engine.chars_for('first.png').should == 'ABC'.split('')
-		end
-
-		it 'can read the second test image' do
-			engine.chars_for('second.png').should == "|'m 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234".gsub(/\s+/, '').split('')
-		end
-
-		it 'raises when going out of the image boundaries' do
-			expect {
-				engine.chars_for('second.png', 0, 0, 1000, 1000)
-			}.should raise_error
-		end
-	end
-
-	describe '#chars_at' do
-		it 'can read the first test image' do
-			pending 'weird results'
-
-			engine.image = 'first.png'
-			engine.chars_at(2, 2, 2, 2).should == []
-		end
-
-		it 'can read the second test image' do
-			pending 'weird results'
-
-			engine.image = 'second.png'
-			engine.chars_at(242, 191, 129, 31).should == 'OH HAI 1234'.gsub(/\s+/, '').split('')
-		end
-
-		it 'raises when going out of the image boundaries' do
-			expect {
-				engine.image = 'second.png'
-				engine.words_at(10, 20, 1000, 1000)
-			}.should raise_error
-		end
-	end
-	
 	describe '#blacklist' do
 		it 'works with removing weird signs' do
 			engine.with { |e| e.blacklist = '|' }.text_for('second.png').strip.should == "I'm 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
