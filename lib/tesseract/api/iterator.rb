@@ -33,6 +33,85 @@ class Iterator
 		C::Iterator.destroy(pointer)
 	end
 
+	def begin
+		C::Iterator.begin(to_ffi)
+	end
+
+	def beginning? (level = :word)
+		C::Iterator.is_at_beginning_of(to_ffi, C.for_enum(level))
+	end
+
+	def end? (level = :word)
+		C::Iterator.is_at_final_element(to_ffi, C.for_enum(level))
+	end
+
+	def next (level = :word)
+		C::Iterator.next(to_ffi, C.for_enum(level))
+	end
+
+	def bounding_box (level = :word)
+		C::Iterator.bounding_box(to_ffi, C.for_enum(level))
+	end
+
+	def block_type
+		C::Iterator.block_type(to_ffi)
+	end
+
+	def get_binary_image (level = :word)
+		Image.new(C::Iterator.get_binary_image(to_ffi, C.for_enum(level)))
+	end
+
+	def get_image (level = :word)
+		image = C::Iterator.get_image(to_ffi, C.for_enum(level))
+
+		Image.new(image.pix, image.x, image.y)
+	end
+
+	def baseline (level = :word)
+		C::Iterator.baseline(to_ffi, C.for_enum(level))
+	end
+
+	def orientation
+		C::Iterator.orientation(to_ffi)
+	end
+
+	def get_text (level = :word)
+		pointer = C::Iterator.get_utf8_text(to_ffi, C.for_enum(level))
+		result  = pointer.read_string
+		result.force_encoding 'UTF-8'
+		C.free_string(pointer)
+
+		result
+	end
+
+	def confidence (level = :word)
+		C::Iterator.confidence(to_ffi, C.for_enum(level))
+	end
+
+	def word_font_attributes
+		C::Iterator.word_font_attributes(to_ffi)
+	end
+
+	def word_is_from_dictionary?
+		C::Iterator.word_is_from_dictionary(to_ffi)
+	end
+
+	def word_is_numeric?
+		C::Iterator.word_is_numeric(to_ffi)
+	end
+
+	def symbol_is_superscript?
+		C::Iterator.symbol_is_superscript(to_ffi)
+	end
+
+	def symbol_is_subscript?
+		C::Iterator.symbol_is_subscript(to_ffi)
+	end
+
+	def symbol_is_dropcap?
+		C::Iterator.symbol_is_dropcap(to_ffi)
+	end
+
 	def to_ffi
 		@internal
 	end

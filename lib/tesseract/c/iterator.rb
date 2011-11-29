@@ -42,7 +42,7 @@ module Iterator
 			]
 
 			enum :PageIteratorLevel, [
-				:BLOCK, :PARA, :TEXTLINE, :WORD, :SYMBOL
+				:BLOCK, :PARAGRAPH, :TEXTLINE, :WORD, :SYMBOL
 			]
 
 			orientation = enum :UP, :RIGHT, :DOWN, :LEFT
@@ -54,6 +54,13 @@ module Iterator
 					:top,    :int,
 					:right,  :int,
 					:bottom, :int
+			}
+
+			Image = Class.new(FFI::Struct) {
+				layout \
+					:pix,  :pointer,
+					:x,    :int,
+					:y,    :int
 			}
 
 			Baseline = Class.new(FFI::Struct) {
@@ -72,9 +79,25 @@ module Iterator
 					:deskew_angle,      :float
 			}
 
-			typedef BoundingBox.by_value, :BoundingBox
-			typedef Baseline.by_value,    :Baseline
-			typedef Orientation.by_value, :OrientationResult
+			FontAttributes = Class.new(FFI::Struct) {
+				layout \
+				:id,        :int,
+				:name,      :string,
+				:pointsize, :int,
+
+				:is_bold,       :bool,
+				:is_italic,     :bool,
+				:is_underlined, :bool,
+				:is_monospace,  :bool,
+				:is_serif,      :bool,
+				:is_smallcaps,  :bool
+			}
+
+			typedef BoundingBox.by_value,    :BoundingBox
+			typedef Image.by_value,          :Image
+			typedef Baseline.by_value,       :Baseline
+			typedef Orientation.by_value,    :OrientationResult
+			typedef FontAttributes.by_value, :FontAttributes
 		}
 
 		cpp.raw %{
@@ -84,6 +107,12 @@ module Iterator
 				int right;
 				int bottom;
 			} BoundingBox;
+
+			typedef struct Image {
+				Pix* pix;
+				int  x;
+				int  y;
+			} Image;
 
 			typedef struct Baseline {
 				int x1;
@@ -98,6 +127,19 @@ module Iterator
 				TextlineOrder    textline_order;
 				float            deskew_angle;
 			} OrientationResult;
+
+			typedef struct FontAttributes {
+				int         id;
+				const char* name;
+				int         pointsize;
+
+				bool is_bold;
+				bool is_italic;
+				bool is_underlined;
+				bool is_monospace;
+				bool is_serif;
+				bool is_smallcaps;
+			} FontAttributes;
 		}
 
 		cpp.function %{
@@ -147,10 +189,16 @@ module Iterator
 		}
 
 		cpp.function %{
-			OrientationResult orientation (PageIterator* it) {
-				OrientationResult result;
-				
-				it->Orientation(&result.orientation, &result.writing_direction, &result.textline_order, &result.deskew_angle);
+			Pix* get_binary_image (PageIterator* it, PageIteratorLevel level) {
+				return it->GetBinaryImage(level);
+			}
+		}
+
+		cpp.function %{
+			Image get_image (PageIterator* it, PageIteratorLevel level, int padding) {
+				Image result;
+
+				result.pix = it->GetImage(level, padding, &result.x, &result.y);
 
 				return result;
 			}
@@ -163,6 +211,69 @@ module Iterator
 				it->Baseline(level, &result.x1, &result.y1, &result.x2, &result.y2);
 
 				return result;
+			}
+		}
+
+		cpp.function %{
+			OrientationResult orientation (PageIterator* it) {
+				OrientationResult result;
+				
+				it->Orientation(&result.orientation, &result.writing_direction, &result.textline_order, &result.deskew_angle);
+
+				return result;
+			}
+		}
+
+		cpp.function %{
+			char* get_utf8_text (ResultIterator* it, PageIteratorLevel level) {
+				return it->GetUTF8Text(level);
+			}
+		}
+
+		cpp.function %{
+			float confidence (ResultIterator* it, PageIteratorLevel level) {
+				return it->Confidence(level);
+			}
+		}
+
+		cpp.function %{
+			FontAttributes word_font_attributes (ResultIterator* it) {
+				FontAttributes result;
+
+				result.name = it->WordFontAttributes(&result.is_bold, &result.is_italic, &result.is_underlined,
+					&result.is_monospace, &result.is_serif, &result.is_smallcaps, &result.pointsize, &result.id);
+
+				return result;
+			}
+		}
+
+		cpp.function %{
+			bool word_is_from_dictionary (ResultIterator* it) {
+				return it->WordIsFromDictionary();
+			}
+		}
+
+		cpp.function %{
+			bool word_is_numeric (ResultIterator* it) {
+				return it->WordIsNumeric();
+			}
+		}
+
+		cpp.function %{
+			bool symbol_is_superscript (ResultIterator* it) {
+				return it->SymbolIsSuperscript();
+			}
+		}
+
+		cpp.function %{
+			bool symbol_is_subscript (ResultIterator* it) {
+				return it->SymbolIsSubscript();
+			}
+		}
+
+		cpp.function %{
+			bool symbol_is_dropcap (ResultIterator* it) {
+				return it->SymbolIsDropcap();
 			}
 		}
 	end

@@ -31,6 +31,16 @@ module Leptonica
 		cpp.include   'leptonica/allheaders.h'
 		cpp.libraries 'lept'
 
+		cpp.eval {
+			enum :Format, [
+				:UNKNOWN, :BMP, :JFIF_JPEG, :PNG,
+				:TIFF, :TIFF_PACKBITS, :TIFF_RLE, :TIFF_G3, :TIFF_G4, :TIFF_LZW, :TIFF_ZIP,
+				:PNM, :PS, :GIF, :JP2, :WEBP, :LPDF, :DEFAULT, :SPIX
+			]
+		}
+
+		cpp.typedef 'int32_t', 'Format'
+
 		cpp.function %{
 			Pix* pix_read (const char* path) {
 				return pixRead(path);
@@ -46,6 +56,12 @@ module Leptonica
 		cpp.function %{
 			Pix* pix_read_mem (const l_uint8* data, size_t size) {
 				return pixReadMem(data, size);
+			}
+		}
+
+		cpp.function %{
+			bool pix_write_mem (Pix* pix, uint8_t** data, size_t* size, Format format) {
+				return pixWriteMem(data, size, pix, format);
 			}
 		}
 

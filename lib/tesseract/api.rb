@@ -25,6 +25,7 @@
 require 'tesseract/extensions'
 require 'tesseract/c'
 
+require 'tesseract/api/image'
 require 'tesseract/api/iterator'
 
 module Tesseract
@@ -34,39 +35,7 @@ class API
 	# Get a pointer to a tesseract-ocr usable image from a path, a string
 	# with the data or an IO stream.
 	def self.image_for (image)
-		image = STDERR.suppress {
-			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
-				C::Leptonica.pix_read(File.expand_path(image))
-			elsif image.is_a?(String)
-				C::Leptonica.pix_read_mem(image, image.bytesize)
-			elsif image.is_a?(IO)
-				C::Leptonica.pix_read_stream(image.to_i)
-			elsif image.respond_to? :to_blob
-				image = image.to_blob
-
-				C::Leptonica.pix_read_mem(image, image.bytesize)
-			end
-		}
-
-		raise ArgumentError, 'invalid image' if image.nil? || image.null?
-
-		image = FFI::AutoPointer.new(image, method(:image_finalizer))
-
-		class << image
-			def width
-				C::Leptonica.pix_get_width(self)
-			end
-
-			def height
-				C::Leptonica.pix_get_height(self)
-			end
-		end
-
-		image
-	end
-
-	def self.image_finalizer (pointer) # :nodoc:
-		C::Leptonica.pix_destroy(pointer)
+		Image.new(image)
 	end
 
 	##
@@ -149,7 +118,7 @@ class API
 	end
 
 	def set_image (pix)
-		C::BaseAPI.set_image(to_ffi, pix)
+		C::BaseAPI.set_image(to_ffi, pix.is_a?(Image) ? pix.to_ffi : pix)
 	end
 
 	def set_rectangle (left, top, width, height)
@@ -164,7 +133,7 @@ class API
 		pointer = C::BaseAPI.get_utf8_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C::BaseAPI.free_string(pointer)
+		C.free_string(pointer)
 
 		result
 	end
@@ -181,7 +150,7 @@ class API
 		pointer = C::BaseAPI.get_box_text(to_ffi, page)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C::BaseAPI.free_string(pointer)
+		C.free_string(pointer)
 
 		result
 	end
@@ -190,7 +159,7 @@ class API
 		pointer = C::BaseAPI.get_unlv_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'ISO8859-1'
-		C::BaseAPI.free_string(pointer)
+		C.free_string(pointer)
 
 		result
 	end

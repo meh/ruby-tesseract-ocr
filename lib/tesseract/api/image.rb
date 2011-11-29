@@ -22,36 +22,65 @@
 # or implied, of meh.
 #++
 
-require 'ffi'
-require 'ffi/extra'
-require 'ffi/inliner'
+module Tesseract; class API
 
-module Tesseract
+class Image
+	def self.new (image)
+		image = STDERR.suppress {
+			if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
+				C::Leptonica.pix_read(File.expand_path(image))
+			elsif image.is_a?(String)
+				C::Leptonica.pix_read_mem(image, image.bytesize)
+			elsif image.is_a?(IO)
+				C::Leptonica.pix_read_stream(image.to_i)
+			elsif image.respond_to? :to_blob
+				image = image.to_blob
 
-module C
-	extend FFI::Inliner
-
-	inline 'C++' do |cpp|
-		cpp.function %{
-			void free_string (char* pointer) {
-				delete [] pointer;
-			}
+				C::Leptonica.pix_read_mem(image, image.bytesize)
+			end
 		}
 
-		cpp.function %{
-			void free_array_of_int (int* pointer) {
-				delete [] pointer;
-			}
-		}
+		raise ArgumentError, 'invalid image' if image.nil? || image.null?
+
+		super(image)
 	end
 
-	def self.for_enum (what)
-		what.is_a?(Integer) ? what : what.to_s.upcase.to_sym
+	attr_accessor :x, :y
+
+	def initialize (pointer, x = 0, y = 0)
+		@internal = FFI::AutoPointer.new(pointer, self.class.method(:finalize))
+		@x        = x
+		@y        = y
+	end
+
+	def self.finalize (pointer)
+		C::Leptonica.pix_destroy(pointer)
+	end
+
+	def width
+		C::Leptonica.pix_get_width(to_ffi)
+	end
+
+	def height
+		C::Leptonica.pix_get_height(to_ffi)
+	end
+
+	def to_blob (format = :default)
+		data = FFI::MemoryPointer.new(:pointer)
+		size = FFI::MemoryPointer.new(:size_t)
+
+		C::Leptonica.pix_write_mem(to_ffi, data, size, C.for_enum(format))
+
+		result = data.typecast(:pointer).read_string(size.typecast(:size_t))
+
+		data.typecast(:pointer).free
+
+		result
+	end
+
+	def to_ffi
+		@internal
 	end
 end
 
-end
-
-require 'tesseract/c/leptonica'
-require 'tesseract/c/baseapi'
-require 'tesseract/c/iterator'
+end; end

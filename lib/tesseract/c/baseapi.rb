@@ -173,18 +173,6 @@ module BaseAPI
 		}
 
 		cpp.function %{
-			void free_string (char* pointer) {
-				delete [] pointer;
-			}
-		}
-
-		cpp.function %{
-			void free_array_of_int (int* pointer) {
-				delete [] pointer;
-			}
-		}
-
-		cpp.function %{
 			void set_image (TessBaseAPI* api, const Pix* pix) {
 				api->SetImage(pix);
 			}

@@ -116,11 +116,7 @@ class Engine
 	end
 
 	def page_segmentation_mode= (value)
-		@api.page_seg_mode = if value.to_i >= 1 && value.to_i <= 10
-			value.to_i
-		else
-			value.to_s.upcase.to_sym
-		end
+		@api.page_seg_mode = C.for_enum(value)
 	end
 
 	def image= (image)
@@ -252,7 +248,7 @@ protected
 			current += 1
 		end
 
-		C::BaseAPI.free_array_of_int(pointer)
+		C.free_array_of_int(pointer)
 
 		words
 	end
