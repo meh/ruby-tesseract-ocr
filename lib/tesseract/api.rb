@@ -65,11 +65,11 @@ class API
 		C::BaseAPI.version(to_ffi)
 	end
 
-	def input_name= (name)
+	def set_input_name (name)
 		C::BaseAPI.set_input_name(to_ffi, name)
 	end
 
-	def output_name= (name)
+	def set_output_name (name)
 		C::BaseAPI.set_output_name(to_ffi, name)
 	end
 
@@ -125,6 +125,30 @@ class API
 		C::BaseAPI.set_rectangle(to_ffi, left, top, width, height)
 	end
 
+	def process_pages (name)
+		result = C.create_string
+
+		unless C::BaseAPI.process_pages(to_ffi, name, result)
+			raise 'process_pages failed'
+		end
+
+		C.string_content(result).read_string(C.string_length(result))
+	ensure
+		C.destroy_string(result)
+	end
+
+	def process_page (pix, page = 0, name = "")
+		result = C.create_string
+
+		unless C::BaseAPI.process_page(to_ffi, pix.is_a?(Image) ? pix.to_ffi : pix, page, name, result)
+			raise 'process_page failed'
+		end
+
+		C.string_content(result).read_string(C.string_length(result))
+	ensure
+		C.destroy_string(result)
+	end
+
 	def get_iterator
 		Iterator.new(C::BaseAPI.get_iterator(to_ffi))
 	end
@@ -133,27 +157,30 @@ class API
 		pointer = C::BaseAPI.get_utf8_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C.free_string(pointer)
 
 		result
+	ensure
+		C.free_array_of_char(pointer)
 	end
 
 	def get_box (page = 0)
 		pointer = C::BaseAPI.get_box_text(to_ffi, page)
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C.free_string(pointer)
 
 		result
+	ensure
+		C.free_array_of_char(pointer)
 	end
 
 	def get_unlv
 		pointer = C::BaseAPI.get_unlv_text(to_ffi)
 		result  = pointer.read_string
 		result.force_encoding 'ISO8859-1'
-		C.free_string(pointer)
 
 		result
+	ensure
+		C.free_array_of_char(pointer)
 	end
 
 	def mean_text_confidence

@@ -75,8 +75,12 @@ class Engine
 		}
 	end
 
-	def train (path)
-		@api.set_input_file(path)
+	def input= (name)
+		@api.set_input_name(name)
+	end
+
+	def output= (name)
+		@api.set_output_name(name)
 	end
 
 	def set (name, value)
@@ -193,6 +197,21 @@ class Engine
 			__send__("#{level}s_for", nil, x, y, width, height)
 		end
 	}
+
+	def process (image, page = nil)
+		if page
+			@api.process_page(API.image_for(image), page)
+		else
+			result = ''
+			page   = 0
+
+			while (tmp = (@api.process_page(API.image_for(image), page) rescue nil))
+				result << tmp
+			end
+
+			result
+		end
+	end
 
 protected
 	def _init

@@ -32,8 +32,11 @@ module C
 	extend FFI::Inliner
 
 	inline 'C++' do |cpp|
+		cpp.include   'tesseract/strngs.h'
+		cpp.libraries 'tesseract'
+
 		cpp.function %{
-			void free_string (char* pointer) {
+			void free_array_of_char (char* pointer) {
 				delete [] pointer;
 			}
 		}
@@ -41,6 +44,30 @@ module C
 		cpp.function %{
 			void free_array_of_int (int* pointer) {
 				delete [] pointer;
+			}
+		}
+
+		cpp.function %{
+			STRING* create_string (void) {
+				return new STRING();
+			}
+		}
+
+		cpp.function %{
+			void destroy_string (STRING* value) {
+				delete value;
+			}
+		}
+
+		cpp.function %{
+			int string_length (STRING* value) {
+				return value->length();
+			}
+		}
+
+		cpp.function %{
+			const char* string_content (STRING* value) {
+				return value->string();
 			}
 		}
 	end

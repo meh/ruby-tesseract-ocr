@@ -77,9 +77,10 @@ class Iterator
 		pointer = C::Iterator.get_utf8_text(to_ffi, C.for_enum(level))
 		result  = pointer.read_string
 		result.force_encoding 'UTF-8'
-		C.free_string(pointer)
 
 		result
+	ensure
+		C.free_array_of_char(pointer)
 	end
 
 	def confidence (level = :word)

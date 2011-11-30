@@ -185,6 +185,18 @@ module BaseAPI
 		}
 
 		cpp.function %{
+			bool process_pages (TessBaseAPI* api, const char* filename, STRING* output) {
+				return api->ProcessPages(filename, NULL, 0, output);
+			}
+		}
+
+		cpp.function %{
+			bool process_page (TessBaseAPI* api, Pix* pix, int page_index, const char* filename, STRING* output) {
+				return api->ProcessPage(pix, page_index, filename, NULL, 0, output);
+			}
+		}
+
+		cpp.function %{
 			ResultIterator* get_iterator (TessBaseAPI* api) {
 				return api->GetIterator();
 			}
