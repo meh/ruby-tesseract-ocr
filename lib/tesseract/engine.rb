@@ -126,7 +126,9 @@ class Engine
 	end
 
 	def page_segmentation_mode= (value)
-		@api.set_page_seg_mode C.for_enum(value)
+		@psm = C.for_enum(value)
+
+		@api.set_page_seg_mode @psm
 	end
 
 	def image= (image)
@@ -226,6 +228,8 @@ protected
 		@config.each {|conf|
 			@api.read_config_file(conf)
 		}
+
+		@api.set_page_seg_mode @psm
 	end
 
 	def _setup (image = nil, x = nil, y = nil, width = nil, height = nil)
