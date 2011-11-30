@@ -204,14 +204,9 @@ class Engine
 		if page
 			@api.process_page(API.image_for(image), page)
 		else
-			result = ''
-			page   = 0
+			raise ArgumentError, 'the path does not exist' unless File.exists?(image)
 
-			while (tmp = (@api.process_page(API.image_for(image), page) rescue nil))
-				result << tmp
-			end
-
-			result
+			@api.process_pages(image)
 		end
 	end
 
@@ -229,7 +224,7 @@ protected
 			@api.read_config_file(conf)
 		}
 
-		@api.set_page_seg_mode @psm
+		@api.set_page_seg_mode @psm if @psm
 	end
 
 	def _setup (image = nil, x = nil, y = nil, width = nil, height = nil)
