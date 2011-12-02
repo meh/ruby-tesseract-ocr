@@ -2,21 +2,26 @@
 require 'tesseract'
 require 'RMagick'
 
+# this function is used to get points near the current pixel to
+# cleanup the oblique lines mess, horizontal points seem to output
+# better cleanup
 def near (x, y)
 	[
-		[x - 1, y - 1],
-		[x,     y - 1],
-		[x + 1, y - 1],
+#		[x - 1, y - 1],
+#		[x,     y - 1],
+#		[x + 1, y - 1],
 		[x - 1, y    ],
-		# FIRE IN THE HOLE
 		[x + 1, y    ],
-		[x - 1, y + 1],
-		[x,     y + 1],
-		[x + 1, y + 1]
+#		[x - 1, y + 1],
+#		[x,     y + 1],
+#		[x + 1, y + 1]
 	]
 end
 
-Tesseract::Engine.new.tap {|engine|
+Tesseract::Engine.new {|engine|
+	engine.page_segmentation_mode = 8
+	engine.whitelist              = [*'a'..'z', *'A'..'Z', *0..9].join
+}.tap {|engine|
 	ARGV.each {|path|
 		image  = Magick::Image.read(path).first
 		pixels = Hash.new { |h, k| h[k] = 0 }
@@ -34,6 +39,7 @@ Tesseract::Engine.new.tap {|engine|
 
 			image.pixel_color x, y, p == text_color ? 'black' : 'white'
 		}
+
 
 		image.each_pixel {|p, x, y|
 			next if p.to_color == 'black' || p.to_color == 'white'
@@ -53,6 +59,6 @@ Tesseract::Engine.new.tap {|engine|
 
 		File.open('/tmp/lol.png', ?w) { |f| f.write(image.resize(10).to_blob) }
 
-		puts engine.text_for(image.resize 10).strip
+		puts "#{path}: #{engine.text_for(image.resize 10).strip}"
 	}
 }
