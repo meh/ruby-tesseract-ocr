@@ -25,4 +25,3 @@
 require 'namedic'
 require 'memoized'
 require 'iso-639'
-require 'io/manage'
