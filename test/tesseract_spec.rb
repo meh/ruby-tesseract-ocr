@@ -78,6 +78,15 @@ describe Tesseract::Engine do
 		end
 	end
 
+	describe '#page_segmentation_mode' do
+		it 'sets it correctly' do
+			engine.with {|e|
+				e.page_segmentation_mode = 8
+				e.whitelist              = [*'a'..'z', *'A'..'Z', *0..9, " ."].join
+			}.text_for('jsmj.png').strip.should == 'JSmj'
+		end
+	end
+
 	describe '#blocks' do
 		it 'works properly with first image' do
 			engine.blocks_for('first.png').first.to_s.should == "ABC\n"
