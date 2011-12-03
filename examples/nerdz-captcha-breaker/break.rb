@@ -1,5 +1,4 @@
 #! /usr/bin/env ruby
-# we need better training data to make this work properly
 require 'tesseract'
 require 'RMagick'
 
