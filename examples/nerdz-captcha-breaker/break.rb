@@ -19,6 +19,8 @@ def near (x, y)
 end
 
 Tesseract::Engine.new {|engine|
+	engine.path                   = './'
+	engine.language               = :lol
 	engine.page_segmentation_mode = 8
 	engine.whitelist              = [*'a'..'z', *'A'..'Z', *0..9].join
 }.tap {|engine|
