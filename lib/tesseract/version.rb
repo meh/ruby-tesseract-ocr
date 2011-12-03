@@ -24,6 +24,6 @@
 
 module Tesseract
 	def self.version
-		'0.0.4'
+		'0.1.0'
 	end
 end
