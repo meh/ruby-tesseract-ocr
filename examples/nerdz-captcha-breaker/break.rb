@@ -1,4 +1,5 @@
 #! /usr/bin/env ruby
+# we need better training data to make this work properly
 require 'tesseract'
 require 'RMagick'
 
@@ -18,8 +19,9 @@ def near (x, y)
 	]
 end
 
+ENV['TESSDATA_PREFIX'] = './'
+
 Tesseract::Engine.new {|engine|
-	engine.path                   = './'
 	engine.language               = :lol
 	engine.page_segmentation_mode = 8
 	engine.whitelist              = [*'a'..'z', *'A'..'Z', *0..9].join
@@ -58,6 +60,8 @@ Tesseract::Engine.new {|engine|
 			image.pixel_color x, y, 'black'
 		}
 
-		puts "#{path}: #{engine.text_for(image.resize 10).strip}"
+		image.scale(4).display if ENV['DEBUG']
+
+		puts "#{path}: #{engine.text_for(image.scale(4)).strip}"
 	}
 }
