@@ -40,7 +40,6 @@ Tesseract::Engine.new {|engine|
 			image.pixel_color x, y, p == text_color ? 'black' : 'white'
 		}
 
-
 		image.each_pixel {|p, x, y|
 			next if p.to_color == 'black' || p.to_color == 'white'
 
@@ -56,8 +55,6 @@ Tesseract::Engine.new {|engine|
 
 			image.pixel_color x, y, 'black'
 		}
-
-		File.open('/tmp/lol.png', ?w) { |f| f.write(image.resize(10).to_blob) }
 
 		puts "#{path}: #{engine.text_for(image.resize 10).strip}"
 	}

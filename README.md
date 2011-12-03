@@ -12,8 +12,14 @@ because it's still under review for upstream merging.
 
 The gem is called `tesseract-ocr`.
 
-Example
--------
+If you're having any problem requiring tesseract or any dependencies, check the permissions of the installed
+gems.
+
+Examples
+--------
+Following are some examples that show the functionalities provided by tesseract-ocr.
+
+### Basic functionality of tesseract
 
 ```ruby
 require 'tesseract'
@@ -24,25 +30,57 @@ e = Tesseract::Engine.new {|e|
 }
 
 e.text_for('test/first.png').strip # => 'ABC'
-
-e.words_for('test/second.png') # [
-                               #      [ 0] #<Tesseract(93.41653442382812): "|'m">,
-                               #      [ 1] #<Tesseract(91.11811828613281): "12">,
-                               #      [ 2] #<Tesseract(85.71760559082031): "and">,
-                               #      [ 3] #<Tesseract(83.4853515625): "what">,
-                               #      [ 4] #<Tesseract(86.71072387695312): "is">,
-                               #      [ 5] #<Tesseract(83.2227783203125): "this.">,
-                               #      [ 6] #<Tesseract(82.81439208984375): "INSTALL">,
-                               #      [ 7] #<Tesseract(86.46566772460938): "GENTOO">,
-                               #      [ 8] #<Tesseract(93.19613647460938): "OH">,
-                               #      [ 9] #<Tesseract(82.81439208984375): "HAI">,
-                               #      [10] #<Tesseract(85.9158935546875): "1234">
-                               #  ]
 ```
 
 You can pass to `#text_for` either a path, an IO object, a string containing the image or
 an object that responds to `#to_blob` (for example  Magick::Image), keep in mind that
 the format has to be supported by leptonica.
+
+### Accessing advanced features
+
+With advanced features you get access to blocks, paragraphs, lines, words and symbols.
+
+There are lot of way to access those levels, the methods are the following (replace level
+with one of the accessible features, so `each_level` can be `each_block` or `each_paragraph`
+etc.)
+
+The following kind of accessors need a block to be passed and they pass to the block each
+`Element` object. The Element object has various getters to access certain features, I'll
+talk about them later.
+
+The methods are:
+
+* `each_level`
+* `each_level_for`
+* `each_level_at`
+
+The following accessors instead return an `Array` of `Element`s with cached getters, the getters
+are cached beacause the values accessible in the `Element` are linked to the state of the internal
+API, and that state changes if you access something else.
+
+The methods are:
+
+*	`levels`
+*	`levels_for`
+*	`levels_at`
+
+Again, to `*_for` methods you can pass what you can pass to a `#text_for`.
+
+Each `Element` object has the following getters:
+
+* `bounding_box`, this will return the box where the element is confined into
+* `binary_image`, this will return the bichromatic image of the element
+* `image`, this will return the image of the element
+* `baseline`, this will return the line where the text is with a pair of coordinates
+* `orientation`, this will return the orientation of the element
+* `text`, this will return the text of the element
+* `confidence`, this will return the confidence of correctness for the element
+
+`Block` elements also have `type` accessors that specify the type of the block.
+
+`Word` elements also have `font_attributes`, `from_dictionary?` and `numeric?` getters.
+
+`Symbol` elements also have `superscript?`, `subscript?` and `dropcap?` getters.
 
 Using the binary
 ----------------

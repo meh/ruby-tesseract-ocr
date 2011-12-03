@@ -178,6 +178,23 @@ class Engine
 			_iterator.__send__ "each_#{level}", &block
 		end
 
+		namedic :image, :x, :y, :width, :height,
+			:optional => 0 .. -1,
+			:alias    => { :w => :width, :h => :height }
+		define_method "each_#{level}_for" do |image = nil, x = nil, y = nil, width = nil, height = nil, &block|
+			self.image = image if image
+			select x, y, width, height
+
+			__send__ "each_#{level}", &block
+		end
+
+		namedic :x, :y, :width, :height,
+			:optional => 0 .. -1,
+			:alias    => { :w => :width, :h => :height }
+		define_method "each_#{level}_at" do |x = nil, y = nil, width = nil, height = nil, &block|
+			__send__ "each_#{level}_for", nil, x, y, width, height, &block
+		end
+
 		define_method "#{level}s" do
 			_iterator.__send__ "#{level}s"
 		end
@@ -189,14 +206,14 @@ class Engine
 			self.image = image if image
 			select x, y, width, height
 
-			__send__("#{level}s")
+			__send__ "#{level}s"
 		end
 
 		namedic :x, :y, :width, :height,
 			:optional => 0 .. -1,
 			:alias    => { :w => :width, :h => :height }
 		define_method "#{level}s_at" do |x = nil, y = nil, width = nil, height = nil|
-			__send__("#{level}s_for", nil, x, y, width, height)
+			__send__ "#{level}s_for", nil, x, y, width, height
 		end
 	}
 
