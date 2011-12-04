@@ -18,6 +18,14 @@ def near (x, y)
 	]
 end
 
+class Magick::Pixel
+	def =~ (other)
+		other = Magick::Pixel.from_color(other) if other.is_a?(String)
+
+		red == other.red && green == other.green && blue == other.blue
+	end
+end
+
 ENV['TESSDATA_PREFIX'] = './'
 
 Tesseract::Engine.new {|engine|
@@ -33,20 +41,20 @@ Tesseract::Engine.new {|engine|
 			pixels[p] += 1
 		}
 
-		pixels.delete(Magick::Pixel.from_color('black'))
+		pixels.reject! { |p| p =~ 'black' }
 
 		text_color, count = pixels.max { |a, b| a.last <=> b.last }
 
 		image.each_pixel {|p, x, y|
-			next unless p == text_color or p.to_color == 'black'
+			next unless p =~ text_color or p =~ 'black'
 
-			image.pixel_color x, y, p == text_color ? 'black' : 'white'
+			image.pixel_color x, y, p =~ text_color ? 'black' : 'white'
 		}
 
 		image.each_pixel {|p, x, y|
-			next if p.to_color == 'black' || p.to_color == 'white'
+			next if p =~ 'black' || p =~ 'white'
 
-			if near(x, y).map { |(x, y)| image.pixel_color x, y }.any? { |p| p.to_color == 'black' }
+			if near(x, y).map { |(x, y)| image.pixel_color x, y }.any? { |p| p =~ 'black' }
 				image.pixel_color x, y, 'gray'
 			else
 				image.pixel_color x, y, 'white'
@@ -54,7 +62,7 @@ Tesseract::Engine.new {|engine|
 		}
 
 		image.each_pixel {|p, x, y|
-			next unless p.to_color == 'gray'
+			next unless p =~ 'gray'
 
 			image.pixel_color x, y, 'black'
 		}
