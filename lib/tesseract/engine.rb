@@ -31,7 +31,7 @@ module Tesseract
 class Engine
 	attr_reader :config
 
-	namedic :path, :language, :mode, :variables,
+	named :path, :language, :mode, :variables,
 		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {}, :config => [] },
 		:alias    => { :data => :path, :lang => :language }
 	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}, config = [], &block) # :yields: self
@@ -135,14 +135,14 @@ class Engine
 		@image = image
 	end
 
-	namedic :x, :y, :width, :height,
+	named :x, :y, :width, :height,
 		:optional => 0 .. -1,
 		:alias    => { :w => :width, :h => :height }
 	def select (x = nil, y = nil, width = nil, height = nil)
 		@rectangle = [x, y, width, height]
 	end
 
-	namedic :image, :x, :y, :width, :height,
+	named :image, :x, :y, :width, :height,
 		:optional => 0 .. -1,
 		:alias    => { :w => :width, :h => :height }
 	def text_for (image = nil, x = nil, y = nil, width = nil, height = nil)
@@ -160,7 +160,7 @@ class Engine
 		}
 	end
 
-	namedic :x, :y, :width, :height,
+	named :x, :y, :width, :height,
 		:optional => 0 .. -1,
 		:alias    => { :w => :width, :h => :height }
 	def text_at (x = nil, y = nil, width = nil, height = nil)
@@ -178,7 +178,7 @@ class Engine
 			_iterator.__send__ "each_#{level}", &block
 		end
 
-		namedic :image, :x, :y, :width, :height,
+		named :image, :x, :y, :width, :height,
 			:optional => 0 .. -1,
 			:alias    => { :w => :width, :h => :height }
 		define_method "each_#{level}_for" do |image = nil, x = nil, y = nil, width = nil, height = nil, &block|
@@ -188,7 +188,7 @@ class Engine
 			__send__ "each_#{level}", &block
 		end
 
-		namedic :x, :y, :width, :height,
+		named :x, :y, :width, :height,
 			:optional => 0 .. -1,
 			:alias    => { :w => :width, :h => :height }
 		define_method "each_#{level}_at" do |x = nil, y = nil, width = nil, height = nil, &block|
@@ -199,7 +199,7 @@ class Engine
 			_iterator.__send__ "#{level}s"
 		end
 
-		namedic :image, :x, :y, :width, :height,
+		named :image, :x, :y, :width, :height,
 			:optional => 0 .. -1,
 			:alias    => { :w => :width, :h => :height }
 		define_method "#{level}s_for" do |image = nil, x = nil, y = nil, width = nil, height = nil|
@@ -209,7 +209,7 @@ class Engine
 			__send__ "#{level}s"
 		end
 
-		namedic :x, :y, :width, :height,
+		named :x, :y, :width, :height,
 			:optional => 0 .. -1,
 			:alias    => { :w => :width, :h => :height }
 		define_method "#{level}s_at" do |x = nil, y = nil, width = nil, height = nil|

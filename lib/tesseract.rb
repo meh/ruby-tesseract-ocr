@@ -22,5 +22,4 @@
 # or implied, of meh.
 #++
 
-require 'tesseract/api'
-require 'tesseract/engine'
+require 'tesseract-ocr'

@@ -22,6 +22,6 @@
 # or implied, of meh.
 #++
 
-require 'namedic'
-require 'memoized'
+require 'call-me/named'
+require 'call-me/memoize'
 require 'iso-639'

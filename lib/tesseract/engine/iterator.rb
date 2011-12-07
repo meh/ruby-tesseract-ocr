@@ -143,7 +143,7 @@ class Iterator
 		define_method "#{level}s" do
 			__send__("each_#{level}").map {|e|
 				e.methods.each {|name|
-					if e.respond_to? "__memoized_#{name}"
+					if e.is_memoized?(name)
 						e.__send__ name
 					end
 				}

@@ -14,8 +14,7 @@ Gem::Specification.new {|s|
 	s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
 	s.require_paths = ['lib']
 
-	s.add_dependency 'namedic'
-	s.add_dependency 'memoized'
+	s.add_dependency 'call-me'
 	s.add_dependency 'iso-639'
 
 	s.add_dependency 'ffi-extra'
