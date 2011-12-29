@@ -44,6 +44,14 @@ OptionParser.new do |o|
 	o.on '-w', '--whitelist LIST', 'whitelist the following chars' do |value|
 		options[:whitelist] = value
 	end
+
+	o.on '-s', '--scale VALUE', Float, 'scale the image before analyzing it' do |value|
+		options[:scale] = value
+	end
+
+	o.on '-r', '--resize VALUE', Float, 'resize the image before analyzing it' do |value|
+		options[:resize] = value
+	end
 end.parse!
 
 Tesseract::Engine.new(options[:path], options[:language], options[:mode]) {|engine|
@@ -53,11 +61,19 @@ Tesseract::Engine.new(options[:path], options[:language], options[:mode]) {|engi
 	engine.page_segmentation_mode = options[:psm] if options[:psm]
 	engine.load_config options[:config]           if options[:config]
 }.tap {|engine|
-	if options[:unlv]
-		puts engine.text_for(ARGV.first).unlv.strip
-	elsif options[:confidence]
-		puts engine.text_for(ARGV.first).confidence
+	image = if options[:scale]
+		require 'RMagick'; Magick::Image.read(ARGV.first).first.scale(options[:scale])
+	elsif options[:resize]
+		require 'RMagick'; Magick::Image.read(ARGV.first).first.resize(options[:resize])
 	else
-		puts engine.text_for(ARGV.first).strip
+		ARGV.first
+	end
+
+	if options[:unlv]
+		puts engine.text_for(image).unlv.strip
+	elsif options[:confidence]
+		puts engine.text_for(image).confidence
+	else
+		puts engine.text_for(image).strip
 	end
 }
