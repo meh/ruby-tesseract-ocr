@@ -22,5 +22,15 @@
 # or implied, of meh.
 #++
 
+module Tesseract
+	def prefix
+		ENV['TESSDATA_PREFIX']
+	end
+
+	def prefix= (path)
+		ENV['TESSDATA_PREFIX'] = path
+	end
+end
+
 require 'tesseract/api'
 require 'tesseract/engine'

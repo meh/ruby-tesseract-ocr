@@ -18,5 +18,5 @@ Gem::Specification.new {|s|
 	s.add_dependency 'iso-639'
 
 	s.add_dependency 'ffi-extra'
-	s.add_dependency 'ffi-inliner'
+	s.add_dependency 'ffi-inline'
 }

@@ -26,7 +26,7 @@ class Magick::Pixel
 	end
 end
 
-ENV['TESSDATA_PREFIX'] = './'
+Tesseract.prefix = './'
 
 Tesseract::Engine.new {|engine|
 	engine.language               = :lol
