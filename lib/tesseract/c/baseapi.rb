@@ -188,13 +188,13 @@ module BaseAPI
 			bool process_pages (TessBaseAPI* api, const char* filename, STRING* output) {
 				return api->ProcessPages(filename, NULL, 0, output);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			bool process_page (TessBaseAPI* api, Pix* pix, int page_index, const char* filename, STRING* output) {
 				return api->ProcessPage(pix, page_index, filename, NULL, 0, output);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			ResultIterator* get_iterator (TessBaseAPI* api) {
@@ -206,31 +206,31 @@ module BaseAPI
 			char* get_utf8_text (TessBaseAPI* api) {
 				return api->GetUTF8Text();
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			char* get_box_text (TessBaseAPI* api, int page_number) {
 				return api->GetBoxText(page_number);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			char* get_unlv_text (TessBaseAPI* api) {
 				return api->GetUNLVText();
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			int mean_text_conf (TessBaseAPI* api) {
 				return api->MeanTextConf();
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			int* all_word_confidences (TessBaseAPI* api) {
 				return api->AllWordConfidences();
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			void clear (TessBaseAPI* api) {

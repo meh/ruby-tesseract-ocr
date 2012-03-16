@@ -177,7 +177,7 @@ module Iterator
 				BoundingBox result;
 
 				it->BoundingBox(level, &result.left, &result.top, &result.right, &result.bottom);
-				
+
 				return result;
 			}
 		}
@@ -217,7 +217,7 @@ module Iterator
 		cpp.function %{
 			OrientationResult orientation (PageIterator* it) {
 				OrientationResult result;
-				
+
 				it->Orientation(&result.orientation, &result.writing_direction, &result.textline_order, &result.deskew_angle);
 
 				return result;
@@ -228,13 +228,13 @@ module Iterator
 			char* get_utf8_text (ResultIterator* it, PageIteratorLevel level) {
 				return it->GetUTF8Text(level);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			float confidence (ResultIterator* it, PageIteratorLevel level) {
 				return it->Confidence(level);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			FontAttributes word_font_attributes (ResultIterator* it) {
