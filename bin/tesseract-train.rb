@@ -7,12 +7,8 @@ require 'shellwords'
 options = {}
 
 OptionParser.new do |o|
-	o.on '-b', '--box FILE', 'the box file to use' do |value|
-		options[:box] = File.realpath(value)
-	end
-
-	o.on '-i', '--image FILE', 'the image file to use' do |value|
-		options[:image] = File.realpath(value)
+	o.on '-d', '--data DATA...', Array, 'the data to use' do |value|
+		options[:data] = Hash[value.map { |e| e.split(?:).map { |p| File.realpath(p) } }]
 	end
 
 	o.on '-o', '--output FILE', 'the path where to output the traineddata' do |value|
@@ -25,24 +21,28 @@ if language = ARGV.shift
 	options[:image]  = File.realpath("#{language}.tif")
 	options[:output] = File.expand_path("#{language}.traineddata")
 else
-	language = options[:box][/^(.*?)\./, 1]
+	language = options[:output][/^(.*?)\./, 1]
 end
 
 Dir.chdir FileUtils.mkpath(File.join(Dir.tmpdir, rand.to_s)).first
 
 language = language.shellescape
 
+options[:data].each_with_index {|(box, image), index|
+	%x{
+		cp #{box.shellescape} #{language}.#{index}.box
+		cp #{image.shellescape} #{language}.#{index}#{File.extname(image)}
+
+		tesseract #{language}.#{index}#{File.extname(image)} #{language} nobatch box.train.stderr
+
+		unicharset_extractor #{language}.box
+
+		echo #{language}.#{index} 0 0 0 0 0 >> font_properties
+		mftraining -F font_properties -U unicharset -O #{language}.unicharset #{language}.tr
+	}
+}
+
 %x{
-	cp #{options[:box].shellescape} #{language}.box
-	cp #{options[:image].shellescape} #{language}#{File.extname(options[:image])}
-
-	tesseract #{language}#{File.extname(options[:image])} #{language} nobatch box.train.stderr
-
-	unicharset_extractor #{language}.box
-
-	echo #{language} 0 0 0 0 0 > font_properties
-	mftraining -F font_properties -U unicharset #{language}.tr
-	mftraining -F font_properties -U unicharset -O #{language}.unicharset #{language}.tr
 	cntraining #{language}.tr
 
 	mv Microfeat #{language}.Microfeat
@@ -56,8 +56,10 @@ language = language.shellescape
 	mv #{language}.traineddata #{options[:output].shellescape}
 }
 
+=begin
 path = File.realpath(Dir.pwd)
 
 Dir.chdir '/'
 
 FileUtils.rm_rf path
+=end
