@@ -45,25 +45,25 @@ module Leptonica
 			Pix* pix_read (const char* path) {
 				return pixRead(path);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			Pix* pix_read_fd (int fd) {
 				return pixReadStream(fdopen(fd, "rb"), 0);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			Pix* pix_read_mem (const l_uint8* data, size_t size) {
 				return pixReadMem(data, size);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			bool pix_write_mem (Pix* pix, uint8_t** data, size_t* size, Format format) {
 				return pixWriteMem(data, size, pix, format);
 			}
-		}
+		}, blocking: true
 
 		cpp.function %{
 			void pix_destroy (Pix* pix) {
