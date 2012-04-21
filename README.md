@@ -1,19 +1,13 @@
 ruby-tesseract - Ruby bindings and wrapper
 ==========================================
-This wrapper binds the TessBaseAPI object through ffi-inliner (which means it will work on JRuby too)
+This wrapper binds the TessBaseAPI object through ffi-inline (which means it will work on JRuby too)
 and then proceeds to wrap said API in a more ruby-esque Engine class.
 
 Making it work
 --------------
 To make this library work you need tesseract-ocr and leptonica libraries and headers and a C++ compiler.
 
-For now you also need to install my own version of [ffi-inliner](https://github.com/meh/ffi-inliner)
-because it's still under review for upstream merging.
-
 The gem is called `tesseract-ocr`.
-
-If you're having any problem requiring tesseract or any dependencies, check the permissions of the installed
-gems.
 
 Examples
 --------
