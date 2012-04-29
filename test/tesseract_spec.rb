@@ -13,7 +13,7 @@ describe Tesseract::Engine do
 		end
 
 		it 'can read the second test image' do
-			engine.text_for('second.png').strip.should == "|'m 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
+			engine.text_for('second.png').strip.should == "#{Tesseract::API.new.version == '3.01' ? ?| : ?I}'m 12 and what is this.\nINSTALL GENTOO\nOH HAI 1234"
 		end
 
 		it 'raises when going out of the image boundaries' do
@@ -74,14 +74,14 @@ describe Tesseract::Engine do
 
 	describe '#whitelist' do
 		it 'makes everything into a number' do
-			engine.with { |e| e.whitelist = '1234567890' }.text_for('second.png').strip.should == "11111 12 3116 1111113115111151\n11157411 6511700\n014 11141 1234"
+			engine.with { |e| e.whitelist = '1234567890' }.text_for('second.png').strip.should match(/^[\d\s]*$/)
 		end
 	end
 
 	describe '#page_segmentation_mode' do
 		it 'sets it correctly' do
 			engine.with {|e|
-				e.page_segmentation_mode = 8
+				e.page_segmentation_mode = :single_line
 				e.whitelist              = [*'a'..'z', *'A'..'Z', *0..9, " ."].join
 			}.text_for('jsmj.png').strip.should == 'JSmj'
 		end
@@ -89,19 +89,19 @@ describe Tesseract::Engine do
 
 	describe '#blocks' do
 		it 'works properly with first image' do
-			engine.blocks_for('first.png').first.to_s.should == "ABC\n"
+			engine.blocks_for('first.png').first.to_s.strip.should == 'ABC'
 		end
 	end
 
 	describe '#paragraphs' do
 		it 'works properly with first image' do
-			engine.paragraphs_for('first.png').first.to_s.should == "ABC\n"
+			engine.paragraphs_for('first.png').first.to_s.strip.should == 'ABC'
 		end
 	end
 
 	describe '#lines' do
 		it 'works properly with first image' do
-			engine.lines_for('first.png').first.to_s.should == "ABC\n"
+			engine.lines_for('first.png').first.to_s.strip.should == 'ABC'
 		end
 	end
 

@@ -155,12 +155,6 @@ module BaseAPI
 		}
 
 		cpp.function %{
-			void read_config_file (TessBaseAPI* api, const char* filename, bool init_only) {
-				api->ReadConfigFile(filename, init_only);
-			}
-		}
-
-		cpp.function %{
 			void set_page_seg_mode (TessBaseAPI* api, PageSegMode mode) {
 				api->SetPageSegMode(mode);
 			}
@@ -243,6 +237,34 @@ module BaseAPI
 				api->End();
 			}
 		}
+	end
+
+	begin
+		inline 'C++' do |cpp|
+			cpp.include   'tesseract/baseapi.h'
+			cpp.libraries 'tesseract'
+
+			cpp.raw 'using namespace tesseract;'
+
+			cpp.function %{
+				void read_config_file (TessBaseAPI* api, const char* filename) {
+					api->ReadConfigFile(filename, false);
+				}
+			}
+		end
+	rescue CompilationError
+		inline 'C++' do |cpp|
+			cpp.include   'tesseract/baseapi.h'
+			cpp.libraries 'tesseract'
+
+			cpp.raw 'using namespace tesseract;'
+
+			cpp.function %{
+				void read_config_file (TessBaseAPI* api, const char* filename) {
+					api->ReadConfigFile(filename);
+				}
+			}
+		end
 	end
 end
 

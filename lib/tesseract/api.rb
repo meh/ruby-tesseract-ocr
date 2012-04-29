@@ -105,8 +105,8 @@ class API
 		end
 	end
 
-	def read_config_file (path, init_only = false)
-		C::BaseAPI.read_config_file(to_ffi, path, init_only)
+	def read_config_file (path)
+		C::BaseAPI.read_config_file(to_ffi, path)
 	end
 
 	def get_page_seg_mode
