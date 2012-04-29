@@ -25,7 +25,7 @@
 module Tesseract; module C
 
 module BaseAPI
-	extend FFI::Inliner
+	extend FFI::Inline
 
 	inline 'C++' do |cpp|
 		cpp.include   'tesseract/baseapi.h'
