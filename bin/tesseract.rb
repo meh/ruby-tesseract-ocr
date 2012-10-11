@@ -22,7 +22,7 @@ OptionParser.new do |o|
 	end
 
 	o.on '-p', '--psm MODE', 'page segmentation mode to use' do |value|
-		options[:psm] = value
+		options[:psm] = value.to_i
 	end
 
 	o.on '-u', '--unlv', 'output in UNLV format' do
