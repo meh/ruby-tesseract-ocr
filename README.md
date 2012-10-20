@@ -1,17 +1,23 @@
 ruby-tesseract - Ruby bindings and wrapper
 ==========================================
-This wrapper binds the TessBaseAPI object through ffi-inline (which means it will work on JRuby too)
-and then proceeds to wrap said API in a more ruby-esque Engine class.
+This wrapper binds the TessBaseAPI object through ffi-inline (which means it
+will work on JRuby too) and then proceeds to wrap said API in a more ruby-esque
+Engine class.
 
 Making it work
 --------------
-To make this library work you need tesseract-ocr and leptonica libraries and headers and a C++ compiler.
+To make this library work you need tesseract-ocr and leptonica libraries and
+headers and a C++ compiler.
 
 The gem is called `tesseract-ocr`.
 
+If you're on a distribution that separates the libraries from headers, remember
+to install the *-dev* package.
+
 Examples
 --------
-Following are some examples that show the functionalities provided by tesseract-ocr.
+Following are some examples that show the functionalities provided by
+tesseract-ocr.
 
 ### Basic functionality of tesseract
 
@@ -26,21 +32,21 @@ e = Tesseract::Engine.new {|e|
 e.text_for('test/first.png').strip # => 'ABC'
 ```
 
-You can pass to `#text_for` either a path, an IO object, a string containing the image or
-an object that responds to `#to_blob` (for example  Magick::Image), keep in mind that
-the format has to be supported by leptonica.
+You can pass to `#text_for` either a path, an IO object, a string containing
+the image or an object that responds to `#to_blob` (for example
+Magick::Image), keep in mind that the format has to be supported by leptonica.
 
 ### Accessing advanced features
 
-With advanced features you get access to blocks, paragraphs, lines, words and symbols.
+With advanced features you get access to blocks, paragraphs, lines, words and
+symbols.
 
-There are lot of way to access those levels, the methods are the following (replace level
-with one of the accessible features, so `each_level` can be `each_block` or `each_paragraph`
-etc.)
+Replace **level** in method names with either `block`, `paragraph`, `line`,
+`word` or `symbol`.
 
-The following kind of accessors need a block to be passed and they pass to the block each
-`Element` object. The Element object has various getters to access certain features, I'll
-talk about them later.
+The following kind of accessors need a block to be passed and they pass to the
+block each `Element` object. The Element object has various getters to access
+certain features, I'll talk about them later.
 
 The methods are:
 
@@ -48,9 +54,10 @@ The methods are:
 * `each_level_for`
 * `each_level_at`
 
-The following accessors instead return an `Array` of `Element`s with cached getters, the getters
-are cached beacause the values accessible in the `Element` are linked to the state of the internal
-API, and that state changes if you access something else.
+The following accessors instead return an `Array` of `Element`s with cached
+getters, the getters are cached beacause the values accessible in the `Element`
+are linked to the state of the internal API, and that state changes if you
+access something else.
 
 The methods are:
 
@@ -65,16 +72,19 @@ Each `Element` object has the following getters:
 * `bounding_box`, this will return the box where the element is confined into
 * `binary_image`, this will return the bichromatic image of the element
 * `image`, this will return the image of the element
-* `baseline`, this will return the line where the text is with a pair of coordinates
+* `baseline`, this will return the line where the text is with a pair of
+  coordinates
 * `orientation`, this will return the orientation of the element
 * `text`, this will return the text of the element
 * `confidence`, this will return the confidence of correctness for the element
 
 `Block` elements also have `type` accessors that specify the type of the block.
 
-`Word` elements also have `font_attributes`, `from_dictionary?` and `numeric?` getters.
+`Word` elements also have `font_attributes`, `from_dictionary?` and `numeric?`
+getters.
 
-`Symbol` elements also have `superscript?`, `subscript?` and `dropcap?` getters.
+`Symbol` elements also have `superscript?`, `subscript?` and `dropcap?`
+getters.
 
 Using the binary
 ----------------
