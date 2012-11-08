@@ -107,3 +107,7 @@ ABC
 > tesseract.rb -c test/first.png 
 86
 ```
+
+License
+-------
+The license is BSD one clause.
