@@ -155,12 +155,15 @@ class API
 
 	def get_text
 		pointer = C::BaseAPI.get_utf8_text(to_ffi)
-		result  = pointer.read_string
+
+		return if pointer.null?
+
+		result = pointer.read_string
 		result.force_encoding 'UTF-8'
 
 		result
 	ensure
-		C.free_array_of_char(pointer)
+		C.free_array_of_char(pointer) unless pointer.null?
 	end
 
 	def get_box (page = 0)
