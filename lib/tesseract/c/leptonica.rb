@@ -48,7 +48,7 @@ module Leptonica
 		}, blocking: true
 
 		cpp.function %{
-			Pix* pix_read_fd (int fd) {
+			Pix* pix_read_stream (int fd) {
 				return pixReadStream(fdopen(fd, "rb"), 0);
 			}
 		}, blocking: true
