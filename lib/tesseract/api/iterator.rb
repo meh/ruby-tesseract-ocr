@@ -62,7 +62,7 @@ class Iterator
 	def get_image (level = :word, padding = 0)
 		image = C::Iterator.get_image(to_ffi, C.for_enum(level), padding)
 
-		Image.new(image.pix, image.x, image.y)
+		Image.new(image[:pix], image[:x], image[:y])
 	end
 
 	def baseline (level = :word)

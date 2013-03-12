@@ -25,7 +25,7 @@
 module Tesseract; class API
 
 class Image
-	def self.new (image)
+	def self.new (image, x = 0, y = 0)
 		image = if image.is_a?(String) && (File.exists?(File.expand_path(image)) rescue nil)
 			C::Leptonica.pix_read(File.expand_path(image))
 		elsif image.is_a?(String)
@@ -36,11 +36,13 @@ class Image
 			image = image.to_blob
 
 			C::Leptonica.pix_read_mem(image, image.bytesize)
+		else
+			image
 		end
 
 		raise ArgumentError, 'invalid image' if image.nil? || image.null?
 
-		super(image)
+		super(image, x, y)
 	end
 
 	attr_accessor :x, :y
