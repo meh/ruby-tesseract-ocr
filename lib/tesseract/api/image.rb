@@ -70,10 +70,8 @@ class Image
 		size = FFI::MemoryPointer.new(:size_t)
 
 		C::Leptonica.pix_write_mem(to_ffi, data, size, C.for_enum(format))
-
 		result = data.typecast(:pointer).read_string(size.typecast(:size_t))
-
-		data.typecast(:pointer).free
+		C.free(data.typecast(:pointer))
 
 		result
 	end

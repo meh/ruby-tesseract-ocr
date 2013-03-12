@@ -36,6 +36,12 @@ module C
 		cpp.libraries 'tesseract'
 
 		cpp.function %{
+			void free (void* pointer) {
+				free(pointer);
+			}
+		}
+
+		cpp.function %{
 			void free_array_of_char (char* pointer) {
 				delete [] pointer;
 			}
