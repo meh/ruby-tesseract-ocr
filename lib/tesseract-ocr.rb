@@ -23,6 +23,7 @@
 #++
 
 module Tesseract
+	include self
 	def prefix
 		ENV['TESSDATA_PREFIX']
 	end
