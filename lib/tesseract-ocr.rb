@@ -23,11 +23,11 @@
 #++
 
 module Tesseract
-	def prefix
+	def self.prefix
 		ENV['TESSDATA_PREFIX']
 	end
 
-	def prefix= (path)
+	def self.prefix=(path)
 		ENV['TESSDATA_PREFIX'] = path
 	end
 end
