@@ -12,7 +12,8 @@ headers and a C++ compiler.
 The gem is called `tesseract-ocr`.
 
 If you're on a distribution that separates the libraries from headers, remember
-to install the *-dev* package.
+to install the *-dev* package. (On Debian, there is no *-dev* package for 
+leptonica, so you have to install it from source.
 
 Examples
 --------
