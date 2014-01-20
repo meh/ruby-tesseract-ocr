@@ -16,9 +16,6 @@ to install the *-dev* package.
 
 On Debian you will need to `libleptonica-dev` and `libtesseract-dev`.
 
-(On Debian, there is no *-dev* package for 
-leptonica, so you have to install it from source.
-
 Examples
 --------
 Following are some examples that show the functionalities provided by
