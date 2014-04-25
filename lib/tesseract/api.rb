@@ -99,7 +99,7 @@ class API
 		end
 	end
 
-	def init (datapath = '.', language = 'eng', mode = :DEFAULT)
+	def init (datapath = Tesseract.prefix || '.', language = 'eng', mode = :DEFAULT)
 		unless C::BaseAPI.init(to_ffi, datapath, language.to_s, mode).zero?
 			raise 'the API did not Init correctly'
 		end
