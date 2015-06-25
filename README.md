@@ -88,6 +88,23 @@ getters.
 `Symbol` elements also have `superscript?`, `subscript?` and `dropcap?`
 getters.
 
+### hOCR
+
+```ruby
+require 'tesseract'
+
+e = Tesseract::Engine.new {|e|
+  e.language  = :eng
+  e.blacklist = '|'
+}
+
+puts e.hocr_for('test/first.png')
+```
+
+You can pass to `#hocr_for` either a path, an IO object, a string containing
+the image or an object that responds to `#to_blob` (for example
+Magick::Image), keep in mind that the format has to be supported by leptonica.
+
 Using the binary
 ----------------
 You can also use the shipped executable in the following way:
