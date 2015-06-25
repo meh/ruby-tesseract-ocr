@@ -32,9 +32,9 @@ class Engine
 	attr_reader :config
 
 	named :path, :language, :mode, :variables,
-		:optional => { :path => '.', :language => :eng, :mode => :DEFAULT, :variables => {}, :config => [] },
+		:optional => { :path => nil, :language => :eng, :mode => :DEFAULT, :variables => {}, :config => [] },
 		:alias    => { :data => :path, :lang => :language }
-	def initialize (path = '.', language = :eng, mode = :DEFAULT, variables = {}, config = [], &block) # :yields: self
+	def initialize (path = nil, language = :eng, mode = :DEFAULT, variables = {}, config = [], &block) # :yields: self
 		@api = API.new
 
 		@initializing = true
@@ -171,6 +171,26 @@ class Engine
 		text_at
 	end
 
+	named :image, :x, :y, :width, :height,
+		:optional => 0 .. -1,
+		:alias    => { :w => :width, :h => :height }
+	def hocr_for (image = nil, x = nil, y = nil, width = nil, height = nil, page = nil)
+		_setup(image, x, y, width, height)
+
+		@api.get_hocr(page || 0)
+	end
+
+	named :x, :y, :width, :height,
+		:optional => 0 .. -1,
+		:alias    => { :w => :width, :h => :height }
+	def hocr_at (x = nil, y = nil, width = nil, height = nil, page = nil)
+		hocr_for(nil, x, y, width, height, page)
+	end
+
+	def hocr
+		hocr_at
+	end
+
 	%w(block paragraph line word symbol).each {|level|
 		define_method "each_#{level}" do |&block|
 			raise ArgumentError, 'you have to pass a block' unless block
@@ -231,7 +251,7 @@ protected
 	def _init
 		@api.end
 
-		@api.init(File.expand_path(@path), API.to_language_code(@language), @mode)
+		@api.init(@path, API.to_language_code(@language), @mode)
 
 		@variables.each {|name, value|
 			@api.set_variable(name.to_s, value.to_s)

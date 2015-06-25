@@ -203,6 +203,12 @@ module BaseAPI
 		}, blocking: true
 
 		cpp.function %{
+			char* get_hocr_text (TessBaseAPI* api, int page_number) {
+				return api->GetHOCRText(page_number);
+			}
+		}, blocking: true
+
+		cpp.function %{
 			char* get_box_text (TessBaseAPI* api, int page_number) {
 				return api->GetBoxText(page_number);
 			}

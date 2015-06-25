@@ -99,8 +99,8 @@ class API
 		end
 	end
 
-	def init (datapath = Tesseract.prefix || '.', language = 'eng', mode = :DEFAULT)
-		unless C::BaseAPI.init(to_ffi, datapath, language.to_s, mode).zero?
+	def init (datapath = nil, language = 'eng', mode = :DEFAULT)
+		unless C::BaseAPI.init(to_ffi, datapath || Tesseract.prefix || '/usr/share', language.to_s, mode).zero?
 			raise 'the API did not Init correctly'
 		end
 	end
@@ -155,6 +155,19 @@ class API
 
 	def get_text
 		pointer = C::BaseAPI.get_utf8_text(to_ffi)
+
+		return if pointer.null?
+
+		result = pointer.read_string
+		result.force_encoding 'UTF-8'
+
+		result
+	ensure
+		C.free_array_of_char(pointer) unless pointer.null?
+	end
+
+	def get_hocr(page = 0)
+		pointer = C::BaseAPI.get_hocr_text(to_ffi, page)
 
 		return if pointer.null?
 
