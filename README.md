@@ -105,6 +105,9 @@ You can pass to `#hocr_for` either a path, an IO object, a string containing
 the image or an object that responds to `#to_blob` (for example
 Magick::Image), keep in mind that the format has to be supported by leptonica.
 
+Please note you have to pass `#hocr_for` the page you want to get the output of
+as well.
+
 Using the binary
 ----------------
 You can also use the shipped executable in the following way:
