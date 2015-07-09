@@ -14,7 +14,7 @@ The gem is called `tesseract-ocr`.
 If you're on a distribution that separates the libraries from headers, remember
 to install the *-dev* package.
 
-On Debian you will need to `libleptonica-dev` and `libtesseract-dev`.
+On Debian you will need to install `libleptonica-dev` and `libtesseract-dev`.
 
 Examples
 --------
