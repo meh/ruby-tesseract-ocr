@@ -167,7 +167,7 @@ module BaseAPI
 		}
 
 		cpp.function %{
-			void set_image (TessBaseAPI* api, const Pix* pix) {
+			void set_image (TessBaseAPI* api, Pix* pix) {
 				api->SetImage(pix);
 			}
 		}
@@ -179,13 +179,13 @@ module BaseAPI
 		}
 
 		cpp.function %{
-			bool process_pages (TessBaseAPI* api, const char* filename, STRING* output) {
+			bool process_pages (TessBaseAPI* api, const char* filename, TessResultRenderer* output) {
 				return api->ProcessPages(filename, NULL, 0, output);
 			}
 		}, blocking: true
 
 		cpp.function %{
-			bool process_page (TessBaseAPI* api, Pix* pix, int page_index, const char* filename, STRING* output) {
+			bool process_page (TessBaseAPI* api, Pix* pix, int page_index, const char* filename, TessResultRenderer* output) {
 				return api->ProcessPage(pix, page_index, filename, NULL, 0, output);
 			}
 		}, blocking: true
