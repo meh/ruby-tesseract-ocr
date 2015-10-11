@@ -41,9 +41,15 @@ class API
 	##
 	# Transform a language code to tesseract-ocr usable codes
 	def self.to_language_code (code)
-		ISO_639.find(code.to_s.downcase).alpha3
-	rescue
-		code.to_s
+		code  = code.to_s.downcase
+		codes = ISO_639.find(code)
+
+		return code unless codes
+
+		term = codes.alpha3_terminologic
+		bibl = codes.alpha3
+
+		term.empty? ? bibl : term
 	end
 
 	Types = {
