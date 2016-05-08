@@ -2,6 +2,12 @@
 require 'rubygems'
 require 'tesseract'
 
+class Block; end
+class Paragraph; end
+class Line; end
+class Word; end
+class Symbol; end
+
 describe Tesseract::Engine do
 	let :engine do
 		Tesseract::Engine.new(language: :eng)

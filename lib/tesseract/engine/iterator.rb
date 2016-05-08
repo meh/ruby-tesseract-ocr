@@ -33,8 +33,6 @@ class Iterator
 	class Element
 		def self.for (level)
 			Iterator.const_get(level.capitalize)
-		rescue
-			self
 		end
 
 		def initialize (level, iterator)
@@ -90,6 +88,10 @@ class Iterator
 			@iterator.block_type
 		end
 	end
+
+	class Paragraph < Element; end
+
+	class Line < Element; end
 
 	class Word < Element
 		memoize
