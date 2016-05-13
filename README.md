@@ -57,7 +57,7 @@ The methods are:
 * `each_level_at`
 
 The following accessors instead return an `Array` of `Element`s with cached
-getters, the getters are cached beacause the values accessible in the `Element`
+getters, the getters are cached because the values accessible in the `Element`
 are linked to the state of the internal API, and that state changes if you
 access something else.
 
