@@ -198,7 +198,7 @@ module Iterator
 			Image get_image (PageIterator* it, PageIteratorLevel level, int padding) {
 				Image result;
 
-				result.pix = it->GetImage(level, padding, &result.x, &result.y);
+				result.pix = it->GetImage(level, padding, result.pix, &result.x, &result.y);
 
 				return result;
 			}
